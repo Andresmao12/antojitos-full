@@ -6,10 +6,10 @@ export const SHEMA_DB = {
             columns: [
                 { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
                 { name: "Nombre", namedb: "Nombre", type: "string", required: true },
-                { name: "Correo Electrónico", namedb: "Correo", type: "string", required: true },
+                { name: "Correo Electrónico", namedb: "Correo", type: "string", valueDefault: "usuariosAntojitos@gmail.com" },
                 { name: "Rol", namedb: "Rol", type: "number", required: true },
                 { name: "Celular", namedb: "Celular", type: "string", required: true },
-                { name: "Dirección", namedb: "Direccion", type: "string", required: true }
+                { name: "Dirección", namedb: "Direccion", type: "string", valueDefault: "Sin informacion" }
             ],
             relations: [
                 { name: "Rol", fk: "Rol" }
@@ -128,7 +128,7 @@ export const SHEMA_DB = {
 
 export const PRODUCT_DETAILS_MOCK = {
     ingredientes: [
-        {ingrediente : 'IngredientePrieba', cantidad: 0},
+        { ingrediente: 'IngredientePrieba', cantidad: 0 },
     ],
     capas: {
         capa1: { ingrediente: 'IngredienteCapaPrueba', cantidad: 0 },

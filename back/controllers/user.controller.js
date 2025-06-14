@@ -30,7 +30,8 @@ export const createUser = async (req, res) => {
         const result = await pool.request()
             .input('Nombre', sql.VarChar, Nombre)
             .input('Correo', sql.VarChar, Correo)
-            .input('Rol', sql.VarChar, Rol)
+            // .input('Rol', sql.VarChar, Rol) Revisar mas adelante
+            .input('Rol', sql.VarChar, "1")
             .input('Celular', sql.VarChar, Celular)
             .input('Direccion', sql.VarChar, Direccion)
             .query(`

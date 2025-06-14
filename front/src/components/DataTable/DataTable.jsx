@@ -7,6 +7,8 @@ import { useApi } from '../../hooks/useApi'
 // RECIBIR TABLESHEMA
 const DataTable = ({ data }) => {
 
+  const excludeValores = ['Rol', 'Estado']
+
   return (
     <table className={styles.tableCont}>
       <thead className={styles.tableCont_head}>
@@ -14,8 +16,13 @@ const DataTable = ({ data }) => {
         <tr className={styles.head}>
           {/* TOMAMOS LAS KEYS DEL PRIMER OBJ PARA LOS ENCABEZADOS */}
           {Array.isArray(data) && data.length > 0 && (
+
             Object.keys(data[0]).map((key, index) => (
-              <th key={index} className={styles.head_data}>{key}</th>
+
+              excludeValores.includes(key) ?
+                null
+                :
+                <th key={index} className={styles.head_data}>{key}</th>
             ))
           )}
           <th className={styles.head_data}>Acciones</th>
@@ -26,13 +33,16 @@ const DataTable = ({ data }) => {
       <tbody className={styles.tableCont_body}>
 
         {/* TOMAMOS LOS VALORES DEL OBJETO PARA LLENAR LA TABLA */}
-        {(Array.isArray(data) && data.length > 0) && data.map((element, index) => 
+        {(Array.isArray(data) && data.length > 0) && data.map((element, index) =>
 
           // Td por cada uno de los datos
           < tr key={index} className={styles.register} >
             {
-              Object.values(element).map((element, index) =>
-                <td className={styles.register_data}>{element}</td>
+              Object.entries(element).map(([key, element], index) =>
+                excludeValores.includes(key) ?
+                  null
+                  :
+                  <td className={styles.register_data}>{element}</td>
               )
             }
             < td className={styles.register_btnCont} >

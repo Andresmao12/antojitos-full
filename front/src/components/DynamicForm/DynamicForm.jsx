@@ -25,16 +25,27 @@ const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
     }
     const handleCreate = (e) => {
         e.preventDefault();
-        createItem(formData)
+
+        const dataConDefaults = {};
+
+        columns.forEach(({ namedb, valueDefault }) => {
+
+            const valor = formData[namedb];
+
+            dataConDefaults[namedb] = (valor !== undefined && valor !== '') ? valor : valueDefault;
+        });
+
+        createItem(dataConDefaults)
     }
 
     return (
         <form className={styles.formCreate} onSubmit={handleCreate}>
-            <h2>{`Registrar ${tableName}`}</h2>
+            <h2>{`Registrar ${tableName.toLowerCase()}`}</h2>
 
             {columns.map((column) => {
                 const { name, namedb, type, required } = column
-                if (namedb.toLowerCase() === 'id') return null
+
+                if (['id', 'rol'].includes(namedb.toLowerCase())) return null
 
                 return (
                     <div className={styles.inpCont}>
