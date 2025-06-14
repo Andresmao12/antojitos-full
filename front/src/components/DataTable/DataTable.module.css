@@ -1,0 +1,35 @@
+.tableCont {
+    width: 100%;
+
+    box-shadow: 0 0 30px -25px #000;
+
+    border-collapse: collapse;
+}
+
+.head_data,
+.register_data,
+.register_btnCont {
+    padding: .8em;
+    text-align: center;
+}
+
+.head_data{
+    text-align: center;
+}
+
+.head {
+    background-color: var(--primary-color);
+}
+
+.register:hover {
+    background-color: var(--tertiary-color);
+}
+
+.register_btnCont {
+
+    /* height: 50px; */
+
+    display: flex;
+    justify-content: center;
+    gap: .2em;
+}

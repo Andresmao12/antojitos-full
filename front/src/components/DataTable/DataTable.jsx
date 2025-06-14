@@ -1,0 +1,50 @@
+import { useState, useEffect } from 'react'
+import styles from "./DataTable.module.css"
+import buttonStyles from "../../styles/buttons.module.css"
+
+import { useApi } from '../../hooks/useApi'
+
+// RECIBIR TABLESHEMA
+const DataTable = ({ data }) => {
+
+  return (
+    <table className={styles.tableCont}>
+      <thead className={styles.tableCont_head}>
+
+        <tr className={styles.head}>
+          {/* TOMAMOS LAS KEYS DEL PRIMER OBJ PARA LOS ENCABEZADOS */}
+          {Array.isArray(data) && data.length > 0 && (
+            Object.keys(data[0]).map((key, index) => (
+              <th key={index} className={styles.head_data}>{key}</th>
+            ))
+          )}
+          <th className={styles.head_data}>Acciones</th>
+        </tr>
+
+      </thead>
+
+      <tbody className={styles.tableCont_body}>
+
+        {/* TOMAMOS LOS VALORES DEL OBJETO PARA LLENAR LA TABLA */}
+        {(Array.isArray(data) && data.length > 0) && data.map((element, index) => 
+
+          // Td por cada uno de los datos
+          < tr key={index} className={styles.register} >
+            {
+              Object.values(element).map((element, index) =>
+                <td className={styles.register_data}>{element}</td>
+              )
+            }
+            < td className={styles.register_btnCont} >
+              <button className={buttonStyles.searchButton}><i className="fa-solid fa-pen-to-square"></i></button>
+              <button className={buttonStyles.deleteButton}><i className="fa-solid fa-trash"></i></button>
+            </td>
+          </tr>
+        )
+        }
+      </tbody >
+    </table >
+  )
+}
+
+export default DataTable

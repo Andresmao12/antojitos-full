@@ -1,0 +1,44 @@
+.addButton {
+    height: 100%;
+    padding: 0 2em;
+    border-radius: 8px;
+
+    background-color: #28a745;
+    color: #FFF;
+    transition: 200ms;
+
+    &:hover {
+        background-color: #0F0;
+        transform: scale(1.01);
+    }
+}
+
+.searchButton {
+    height: 100%;
+    padding: .5em 1em;
+    border-radius: 8px;
+
+    color: #fff;
+    background-color: #007bff;
+    transition: 200ms;
+
+    &:hover {
+        background-color: #009;
+        color: #FFF;
+    }
+}
+
+.deleteButton {
+    height: 100%;
+    padding: .5em 1em;
+    border-radius: 8px;
+
+    color: #FFF;
+    background-color: #dc3545;
+    transition: 200ms;
+
+    &:hover {
+        background-color: #900;
+        color: #FFF;
+    }
+}

@@ -1,0 +1,32 @@
+:root {
+    --primary-color: #C599B6;
+    --secondary-color: #E6B2BA;
+    --tertiary-color: #FAD0C4;
+    --cuartiary-color: #FFF7F3;
+    /*Considerar eliminarlo*/
+    --bg-color: #FFF7F3;
+    --text-color: #000;
+    --text-color-aux: #EB3678;
+
+
+    --font-family: 'Segoe UI';
+    --border-radius: 12px;
+
+}
+
+
+.dark-mode {
+    --primary-color: #352F44;
+    --secondary-color: #2A2438;
+    --tertiary-color: #411E8F;
+    --cuartiary-color: #310A5D;
+    /*Considerar eliminarlo*/
+    --bg-color: #2A2438;
+    --text-color: #E9B5D2;
+    --text-color-aux: #EB3678;
+
+
+    --font-family: 'Nunito';
+    --border-radius: 8px;
+
+}

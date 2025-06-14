@@ -1,0 +1,57 @@
+.targetCont {
+
+    padding: 1em;
+
+    background-size: cover;
+    border-radius: 8px;
+    box-shadow: 0 0 30px -20px #000;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: end;
+    gap: 5px;
+
+    position: relative;
+
+    cursor: pointer;
+
+    transition: 200ms;
+
+    &::before {
+        content: ' ';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        background-color: #000A;
+        transition: 200ms;
+
+    }
+
+    &:hover {
+        /* color: var(--aux-first-color);
+        background-color: var(--primary-color); */
+        box-shadow: 0 0 60px -30px var(--aux-first-color);
+        transform: scale(1.01);
+
+        &::before {
+            background-color: #0002;
+        }
+
+
+    }
+}
+
+.textCont{
+    z-index: 5;
+    color: #FFf;
+
+}
+
+.targetCont .icon {
+    width: 100%;
+    min-height: 30%;
+}
