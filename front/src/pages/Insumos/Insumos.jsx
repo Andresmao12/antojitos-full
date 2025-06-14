@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 
-import styles from "./Clientes.module.css"
+import styles from "./Insumos.module.css"
 import buttonStyles from "../../styles/buttons.module.css"
 
 import DataTable from '../../components/DataTable/DataTable'
@@ -12,12 +12,12 @@ import { SHEMA_DB } from '../../utils/constants'
 import { useApi } from '../../hooks/useApi'
 
 
-const Clientes = () => {
+const Insumos = () => {
     console.log('SHEMA_DB', SHEMA_DB)
 
-    const tableSchema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'usuario')
-
-    const { data, fetchAll, fetchById, createItem, updateItem, deleteItem, loading, error, item } = useApi(tableSchema)
+    const tableShema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'insumo')
+    console.log("TABLESHEMA A PASAR DESDE INSUMOS: ----> ", tableShema)
+    const { data, fetchAll, fetchById, createItem, updateItem, deleteItem, loading, error, item } = useApi(tableShema)
     const [formData, setFormData] = useState({})
     const [showCreate, setShowCreate] = useState(false)
 
@@ -36,7 +36,7 @@ const Clientes = () => {
                 <SearchInput />
                 <button className={buttonStyles.addButton} onClick={handleShowCreate}>Añadir</button>
             </div>
-            {showCreate && <DynamicForm tableSchema={tableSchema} regiterData={formData} showCreate={handleShowCreate} />}
+            {showCreate && <DynamicForm tableSchema={tableShema} regiterData={formData} showCreate={handleShowCreate} />}
             <div className={styles.registersCont}>
                 <DataTable data={data} />
             </div>
@@ -44,4 +44,4 @@ const Clientes = () => {
     )
 }
 
-export default Clientes
+export default Insumos

@@ -63,7 +63,7 @@ export const create = async (tableSchema, data) => {
             throw new Error(`-- Error creando el registro ${res.status} ${res.statusText}`);
 
         const result = await res.json();
-        console.log('-- Se creo correcte')
+        console.log('-- Resultado del POST:', result);
         return result;
     } catch (e) {
         throw new Error(`--Error al hacer el POST: ${e}`);

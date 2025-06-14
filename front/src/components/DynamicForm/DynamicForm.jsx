@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 import styles from './DynamicForm.module.css'
 import buttonStyles from '../../styles/buttons.module.css'
@@ -8,7 +8,8 @@ import { useApi } from '../../hooks/useApi'
 
 const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
 
-    const { namedb: tableName, columns, relations } = tableSchema
+
+    const { name: tableName, columns, relations } = tableSchema
     const { createItem, updateItem, loading, error, item } = useApi(tableSchema)
 
     console.log('tableSchema desde DynamicForm: ', tableSchema)
@@ -73,7 +74,7 @@ const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
             {/* {relations && relations.map((relation) => {})} */}
 
             <div className={styles.btnGroup}>
-                <button className={`${buttonStyles.deleteButton} ${styles.submitCreateBtn}`} onClick={handleShowCreate}>Cerrar</button>
+                <button type='button' className={`${buttonStyles.deleteButton} ${styles.submitCreateBtn}`} onClick={handleShowCreate}>Cerrar</button>
                 <button type="submit" className={`${buttonStyles.searchButton} ${styles.submitCreateBtn}`}>Guardar {tableName}</button>
             </div>
         </form>

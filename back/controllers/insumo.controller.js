@@ -21,30 +21,29 @@ export const getUserById = (req, res) => {
     res.json({ name: `Insumo ${id}` });
 };
 
-export const createUser = async (req, res) => {
-    const { Nombre, Correo, Rol, Celular, Direccion } = req.body;
+export const createInsumo = async (req, res) => {
+    const { Nombre, Unidad, CantidadDisponible, PrecioUnitario } = req.body;
 
     try {
         const pool = await sql.connect(config);
 
         const result = await pool.request()
             .input('Nombre', sql.VarChar, Nombre)
-            .input('Correo', sql.VarChar, Correo)
-            .input('Rol', sql.VarChar, Rol)
-            .input('Celular', sql.VarChar, Celular)
-            .input('Direccion', sql.VarChar, Direccion)
+            .input('Unidad', sql.VarChar, Unidad)
+            .input('CantidadDisponible', sql.Numeric, CantidadDisponible)
+            .input('PrecioUnitario', sql.Decimal, PrecioUnitario)
             .query(`
-                INSERT INTO Insumo (Nombre, Correo, Rol, Celular, Direccion)
-                VALUES (@Nombre, @Correo, @Rol, @Celular, @Direccion)
+                INSERT INTO Insumo (Nombre, Unidad, CantidadDisponible, PrecioUnitario)
+                VALUES (@Nombre, @Unidad, @CantidadDisponible, @PrecioUnitario)
             `);
 
         console.log(result);
-        res.status(201).json({ message: 'Usuario creado exitosamente' });
+        res.status(201).json({ message: 'Producto creado exitosamente' });
 
         pool.close();
     } catch (error) {
-        console.error('-- Error al crear usuario:', error);
-        res.status(500).json({ error: 'Error al crear el usuario' });
+        console.error('-- Error al crear Producto:', error);
+        res.status(500).json({ error: 'Error al crear el Producto' });
     }
 };
 
