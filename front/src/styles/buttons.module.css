@@ -1,11 +1,16 @@
 .addButton {
-    height: 100%;
-    padding: 0 2em;
+    /* height: 100%; */
+    /* padding: 0 2em; */
     border-radius: 8px;
 
     background-color: #28a745;
     color: #FFF;
     transition: 200ms;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
 
     &:hover {
         background-color: #0F0;
@@ -14,10 +19,12 @@
 }
 
 .searchButton {
-    height: 100%;
+    /* height: 100%; */
     padding: .5em 1em;
     border-radius: 8px;
 
+    text-align: center;
+    
     color: #fff;
     background-color: #007bff;
     transition: 200ms;
@@ -29,7 +36,7 @@
 }
 
 .deleteButton {
-    height: 100%;
+    /* height: 100%; */
     padding: .5em 1em;
     border-radius: 8px;
 

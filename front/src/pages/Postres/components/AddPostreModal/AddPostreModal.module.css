@@ -176,6 +176,14 @@
     height: 10px;
 }
 
+
+.addButton {
+
+    height: 80%;
+    font-size: 25px;
+
+}
+
 .ingredienteCont {
     width: 100%;
     display: flex;
@@ -201,6 +209,47 @@
     background-color: #f4e4d5;
 }
 
-.selectOption {
-    color: red;
+
+/* ESTILOS SELECTS */
+.select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 16px;
+
+    position: relative;
+
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.selectCont {
+    position: relative;
+}
+
+/* flechita personalizada */
+.selectCont::after {
+    content: "▼";
+
+    font-size: 10px;
+    color: #666;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.select:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    outline: none;
 }

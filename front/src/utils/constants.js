@@ -33,7 +33,8 @@ export const SHEMA_DB = {
                 { name: "Descripción", namedb: "Descripcion", type: "string", required: true },
                 { name: "URL de Imagen", namedb: "UrlImagen", type: "string", required: true },
                 { name: "Datos del proceso", namedb: "DatosProceso", type: "string", required: true },
-                { name: "Precio de Venta", namedb: "PrecioVenta", type: "number", required: true }
+                { name: "Precio de Venta", namedb: "PrecioVenta", type: "number", required: true },
+                { name: "Tamaño", namedb: "Tamanio", type: "string", required: true }
             ],
             showInSlider: true
         },
@@ -43,6 +44,7 @@ export const SHEMA_DB = {
             columns: [
                 { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
                 { name: "Nombre", namedb: "Nombre", type: "string", required: true },
+                { name: "Proveedor", namedb: "Proveedor", type: "string", required: true },
                 { name: "Unidad", namedb: "Unidad", type: "string", required: true },
                 { name: "Cantidad Disponible", namedb: "CantidadDisponible", type: "number", required: true },
                 { name: "Precio Unitario", namedb: "PrecioUnitario", type: "number", required: true }

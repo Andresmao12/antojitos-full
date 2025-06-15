@@ -10,7 +10,7 @@ const PostreCard = ({ id, title, desc, img, tableShema }) => {
     <div className={styles.targetCont} style={{ backgroundImage: `url(${img})` }} onClick={() => navigate(`${titleUrl}-${id}`)}>
       <div className={styles.textCont}>
         <h1>{title}</h1>
-        <p>{desc}</p>
+        <p className={styles.textCont_p}>{desc}</p>
       </div>
     </div>
   )

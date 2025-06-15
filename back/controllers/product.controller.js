@@ -7,7 +7,7 @@ export const getAll = async (req, res) => {
         console.log(result.recordset)
         res.json(result.recordset);
 
-        pool.close()
+
 
     } catch (error) {
         console.error('-- Error al obtener productos:', error);
@@ -27,7 +27,7 @@ export const getPostreById = async (req, res) => {
         console.log(result.recordset)
         res.json(result.recordset);
 
-        pool.close()
+
 
     } catch (error) {
         console.error('-- Error al obtener productos:', error);
@@ -36,9 +36,9 @@ export const getPostreById = async (req, res) => {
 };
 
 export const createPostre = async (req, res) => {
-    const { Nombre, UrlImagen, Descripcion, DatosProceso, PrecioVenta, insumos } = req.body;
+    const { Nombre, UrlImagen, Descripcion, Tamanio, DatosProceso, PrecioVenta, insumos } = req.body;
 
-    console.log("DATOS PROCESOOOOO: ----->"  , JSON.stringify(DatosProceso))
+    console.log("DATOS PROCESOOOOO: ----->", JSON.stringify(DatosProceso))
 
     try {
         const pool = await sql.connect(config);
@@ -47,11 +47,12 @@ export const createPostre = async (req, res) => {
             .input('Nombre', sql.VarChar, Nombre)
             .input('UrlImagen', sql.VarChar, UrlImagen)
             .input('Descripcion', sql.VarChar, Descripcion)
+            .input('Tamanio', sql.VarChar, Tamanio)
             .input('PrecioVenta', sql.Decimal, PrecioVenta)
             .input('DatosProceso', sql.VarChar, DatosProceso)
             .query(`
-                INSERT INTO Producto (Nombre, UrlImagen, Descripcion, PrecioVenta, DatosProceso)
-                VALUES (@Nombre, @UrlImagen, @Descripcion, @PrecioVenta, @DatosProceso);
+                INSERT INTO Producto (Nombre, UrlImagen, Descripcion, PrecioVenta, DatosProceso, Tamanio)
+                VALUES (@Nombre, @UrlImagen, @Descripcion, @PrecioVenta, @DatosProceso, @Tamanio);
                 SELECT SCOPE_IDENTITY() AS NewId
             `);
 
@@ -78,7 +79,7 @@ export const createPostre = async (req, res) => {
 
         res.status(201).json({ message: 'Producto creado exitosamente' });
 
-        pool.close();
+        ;
 
     } catch (error) {
         console.error('-- Error al crear usuario:', error);

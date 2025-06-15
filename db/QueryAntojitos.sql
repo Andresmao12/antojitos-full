@@ -29,6 +29,7 @@ CREATE TABLE Usuario (
 CREATE TABLE Insumo (
     Id INT PRIMARY KEY IDENTITY,
     Nombre NVARCHAR(100) NOT NULL,
+    Proveedor NVARCHAR(100) NOT NULL,
     Unidad NVARCHAR(20) NOT NULL, 
     CantidadDisponible DECIMAL(12, 2) DEFAULT 0,
     PrecioUnitario DECIMAL(10, 2) DEFAULT 0,
@@ -41,6 +42,7 @@ CREATE TABLE Producto (
     Nombre NVARCHAR(100) NOT NULL,
     Descripcion NVARCHAR(255),
     UrlImagen NVARCHAR(255),
+    Tamanio NVARCHAR(10),
     DatosProceso NVARCHAR(4000),
     PrecioVenta DECIMAL(10, 2) NOT NULL,
     FechaCreacion DATETIME DEFAULT GETDATE()

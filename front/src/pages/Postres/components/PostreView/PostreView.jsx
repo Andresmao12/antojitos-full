@@ -74,7 +74,10 @@ const PostreView = () => {
 
             <div className={styles.details}>
                 <p><strong>Creado:</strong> {new Date(item.FechaCreacion).toLocaleString()}</p>
-                <p><strong>Precio:</strong> ${item.PrecioVenta}</p>
+                <div className={styles.precioCont}>
+                    <p><strong>Precio ➜</strong> ${item.PrecioVenta}</p>
+                    <p><strong>Tamaño ➜</strong> {item.Tamanio}</p>
+                </div>
 
                 <div className={styles.datosProcesoCont}>
                     <div className={styles.titleBtnCont}>
@@ -111,7 +114,7 @@ const PostreView = () => {
                         <h3>Capas</h3>
                         {!DataProceso?.capas && DataProceso?.capas === undefined ? (
                             <p>No hay capas definidas.</p>
-                        ) :(
+                        ) : (
                             <div className={styles.capasContainer}>
                                 {Object.entries(DataProceso.capas).map(([nombreCapa, info], idx) => (
                                     <div key={idx} className={styles.capaItem}>

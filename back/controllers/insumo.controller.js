@@ -7,7 +7,7 @@ export const getAll = async (req, res) => {
         console.log(result.recordset)
         res.json(result.recordset);
 
-        pool.close()
+        
 
     } catch (error) {
         console.error('-- Error al obtener usuarios:', error);
@@ -40,7 +40,7 @@ export const createInsumo = async (req, res) => {
         console.log(result);
         res.status(201).json({ message: 'Producto creado exitosamente' });
 
-        pool.close();
+        ;
     } catch (error) {
         console.error('-- Error al crear Producto:', error);
         res.status(500).json({ error: 'Error al crear el Producto' });

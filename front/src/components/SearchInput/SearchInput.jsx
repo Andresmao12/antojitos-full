@@ -11,7 +11,7 @@ const SearchInput = () => {
                 className={styles.searchInput}
             />
 
-            <input type="button" className={buttonStyles.searchButton} value={"Buscar"} />
+            <input type="button" className={`${buttonStyles.searchButton} ${styles.searchButton}`} value={"Buscar"} />
         </div>
     );
 }

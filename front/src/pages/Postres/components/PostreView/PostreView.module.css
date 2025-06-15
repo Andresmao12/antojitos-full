@@ -163,7 +163,7 @@
     border-radius: 10px;
     box-shadow: 0 0 4px -1px var(--tertiary-color);
 
-    &:hover{
+    &:hover {
         background-color: var(--secondary-color);
     }
 }
@@ -181,4 +181,17 @@
     border-radius: 10px;
     /* background-color: var(--cuartiary-color); */
     /* background-color: var(--cuartiary-color); */
+}
+
+.precioCont {
+    width: max-content;
+
+    display: flex;
+    gap: 2em;
+    padding: .5em 1.5em;
+
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: #fff8f0;
+    ;
 }

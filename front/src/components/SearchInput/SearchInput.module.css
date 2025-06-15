@@ -22,10 +22,17 @@
     border-radius: 8px;
     transition: border 300ms;
 
-    flex-grow: 1;
+    flex-grow: .9;
 }
 
 .searchInput:focus {
     border-color: pink;
     box-shadow: 0 0 30px -20px pink;
+}
+
+
+.searchButton{
+    height: 90%;
+    flex-grow: .1;
+
 }

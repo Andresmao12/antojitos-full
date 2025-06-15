@@ -34,7 +34,7 @@ const Insumos = () => {
         <>
             <div className={styles.searchAddCont}>
                 <SearchInput />
-                <button className={buttonStyles.addButton} onClick={handleShowCreate}>Añadir</button>
+                <button className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleShowCreate}>Añadir</button>
             </div>
             {showCreate && <DynamicForm tableSchema={tableShema} regiterData={formData} showCreate={handleShowCreate} />}
             <div className={styles.registersCont}>

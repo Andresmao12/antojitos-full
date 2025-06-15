@@ -6,7 +6,7 @@ import buttonStyles from '../../../../styles/buttons.module.css'
 import { useApi } from '../../../../hooks/useApi'
 import { SHEMA_DB, PRODUCT_DETAILS } from '../../../../utils/constants'
 
-const AddPostreModal = ({ handleShowModal }) => {
+const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
 
     const tableSchema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'producto')
     const { namedb: tableName, columns, relations } = tableSchema
@@ -69,7 +69,7 @@ const AddPostreModal = ({ handleShowModal }) => {
         setCapa(nuevaCapa);
     }
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
 
         e.preventDefault()
         console.log("FORMDATA AL HACER SUBMIT: ", formData)
@@ -79,15 +79,17 @@ const AddPostreModal = ({ handleShowModal }) => {
 
             const dataToSend = formData
             dataToSend.insumos = ingredientes
-            dataToSend.DatosProceso = JSON.stringify({ capas  })
-            console.log("CAPA DATATOSEND: ", dataToSend)
+            dataToSend.DatosProceso = JSON.stringify({ capas })
 
             delete dataToSend?.capa
             delete dataToSend?.ingrediente
             if ("capa-cantidad" in dataToSend) delete dataToSend["capa-cantidad"]
             if ("ingrediente-cantidad" in dataToSend) delete dataToSend["ingrediente-cantidad"]
 
-            createItem(dataToSend)
+            console.log("DATA TO SEND: ", dataToSend)
+            await createItem(dataToSend)
+            await handleRefresh()
+
         } catch (e) {
             console.log("Error creando el producto: ", (e))
         }
@@ -124,22 +126,25 @@ const AddPostreModal = ({ handleShowModal }) => {
 
                 <h3>{'Ingredientes'}</h3>
                 <div className={styles.inpGroup} >
-                    <select
-                        id={`inp-ingrediente`}
-                        className={styles.select}
-                        name={`ingrediente`}
-                        placeholder=" "
-                        required
-                        onChange={handleChange}
-                        value={formData[`ingrediente`] || ''}
-                    >
-                        {dataFrom['Insumo']?.map((insumo, idx) => (
-                            <option key={idx} value={insumo.Id}>{insumo.Nombre}</option>
-                        ))}
-                    </select>
+                    <div className={styles.selectCont}>
+                        <select
+                            id={`inp-ingrediente`}
+                            className={styles.select}
+                            name={`ingrediente`}
+                            placeholder=" "
+                            required
+                            onChange={handleChange}
+                            value={formData[`ingrediente`] || ''}
+                        >
+                            <option>Seleccione...</option>
+                            {(dataFrom["Insumo"]?.length > 0) && dataFrom['Insumo']?.map((insumo, idx) => (
+                                <option key={idx} value={insumo.Id}>{insumo.Nombre}</option>
+                            ))}
+                        </select>
+                    </div>
                     <div className={styles.inpCont}>
                         <input
-                            id={`inp-cantidad`}
+                            id={`inp-ingrediente-cantidad`}
                             name="ingrediente-cantidad"
                             type='number'
                             placeholder=" "
@@ -150,7 +155,12 @@ const AddPostreModal = ({ handleShowModal }) => {
 
                         <label htmlFor={`inp-cantidad`}>{'Cantidad'}</label>
                     </div>
-                    <button className={buttonStyles.addButton} onClick={handleIngredienteSubmit}>+</button>
+                    <input
+                        type="button"
+                        value="+"
+                        className={`${buttonStyles.addButton} ${styles.addButton}`}
+                        onClick={handleIngredienteSubmit}
+                    />
                 </div>
                 <div className={styles.ingredientesCont}>
                     {ingredientes?.length > 0 && ingredientes.map((ingrediente, idx) => (
@@ -162,23 +172,26 @@ const AddPostreModal = ({ handleShowModal }) => {
                 </div>
                 <h3>{'Capas'}</h3>
                 <div className={styles.inpGroup}>
-                    <select
-                        id={`inp-ingrediente`}
-                        className={styles.select}
-                        name={`capa`}
-                        placeholder=" "
-                        required={true}
-                        onChange={handleChange}
-                        value={formData[`capa`] || ''}
-                    >
-                        {(ingredientes.length > 0 && dataFrom["Insumo"].length > 0) && ingredientes?.map((insumo, idx) => (
+                    <div className={styles.selectCont}>
+                        <select
+                            id={`inp-capa`}
+                            className={styles.select}
+                            name={`capa`}
+                            placeholder=" "
+                            required={true}
+                            onChange={handleChange}
+                            value={formData[`capa`] || ''}
+                        >
+                            <option>Seleccione...</option>
 
-                            <option className={styles.selectOption} key={idx} value={insumo.Id}>{dataFrom['Insumo'].find(element => element.Id == insumo.insumoId).Nombre}</option>
-                        ))}
-                    </select>
+                            {(ingredientes.length > 0 && dataFrom["Insumo"].length > 0) && ingredientes?.map((insumo, idx) => (
+                                <option className={styles.selectOption} key={idx} value={insumo.Id}>{dataFrom['Insumo'].find(element => element.Id == insumo.insumoId).Nombre}</option>
+                            ))}
+                        </select>
+                    </div>
                     <div className={styles.inpCont}>
                         <input
-                            id={`inp-cantidad`}
+                            id={`inp-capa-cantidad`}
                             name='capa-cantidad'
                             type='number'
                             placeholder=" "
@@ -192,7 +205,7 @@ const AddPostreModal = ({ handleShowModal }) => {
                     <input
                         type="button"
                         value="+"
-                        className={buttonStyles.addButton}
+                        className={`${buttonStyles.addButton} ${styles.addButton}`}
                         onClick={handleCapaSubmit}
                     />
                 </div>

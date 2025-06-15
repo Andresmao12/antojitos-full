@@ -38,17 +38,23 @@ const Postres = () => {
 
     const handleShowCreate = () => setShowCreate(!showCreate)
 
+    const handleRefresh = async () => {
+        console.log("SE REFRESCO CORRECTAMENTE")
+        await fetchAll()
+        setShowCreate(false)
+    }
+
     console.log(' DATA DESDE POSTRES: ', data)
 
     return (<>
 
         <div className={styles.searchAddCont}>
             <SearchInput />
-            <button className={buttonStyles.addButton} onClick={handleShowCreate}>Añadir</button>
+            <button className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleShowCreate}>Añadir</button>
         </div>
 
         {/* {showCreate && <DynamicForm tableShema={tableShema} regiterData={formData} showCreate={handleShowCreate} />} */}
-        {showCreate && <AddPostreModal handleShowModal={handleShowCreate}/>}
+        {showCreate && <AddPostreModal handleShowModal={handleShowCreate} handleRefresh={handleRefresh} />}
 
         <div className={styles.cardCont}>
             {Array.isArray(data) &&
