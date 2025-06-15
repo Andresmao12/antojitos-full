@@ -43,9 +43,11 @@ const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
             <h2>{`Registrar ${tableName.toLowerCase()}`}</h2>
 
             {columns.map((column) => {
-                const { name, namedb, type, required } = column
+                const { name, namedb, type, required, readonly } = column
 
-                if (['id', 'rol'].includes(namedb.toLowerCase())) return null
+                if (readonly) return null
+
+                if (['id', 'rol', "FechaActualizacion"].includes(namedb.toLowerCase())) return null
 
                 return (
                     <div className={styles.inpCont}>

@@ -7,7 +7,7 @@ export const getAll = async (req, res) => {
         console.log(result.recordset)
         res.json(result.recordset);
 
-        
+
 
     } catch (error) {
         console.error('-- Error al obtener usuarios:', error);
@@ -22,20 +22,35 @@ export const getUserById = (req, res) => {
 };
 
 export const createInsumo = async (req, res) => {
-    const { Nombre, Unidad, CantidadDisponible, PrecioUnitario } = req.body;
+    const { Nombre, Proveedor, Presentacion, CantidadPorPresentacion, PrecioPresentacion, CantidadDisponible } = req.body;
 
     try {
         const pool = await sql.connect(config);
 
         const result = await pool.request()
             .input('Nombre', sql.VarChar, Nombre)
-            .input('Unidad', sql.VarChar, Unidad)
-            .input('CantidadDisponible', sql.Numeric, CantidadDisponible)
-            .input('PrecioUnitario', sql.Decimal, PrecioUnitario)
+            .input('Proveedor', sql.VarChar, Proveedor)
+            .input('Presentacion', sql.VarChar, Presentacion)
+            .input('CantidadPorPresentacion', sql.Decimal(10, 2), CantidadPorPresentacion)
+            .input('PrecioPresentacion', sql.Decimal(10, 2), PrecioPresentacion)
+            .input('CantidadDisponible', sql.Decimal(12, 2), CantidadDisponible)
             .query(`
-                INSERT INTO Insumo (Nombre, Unidad, CantidadDisponible, PrecioUnitario)
-                VALUES (@Nombre, @Unidad, @CantidadDisponible, @PrecioUnitario)
-            `);
+            INSERT INTO Insumo (
+                Nombre,
+                Proveedor,
+                Presentacion,
+                CantidadPorPresentacion,
+                PrecioPresentacion,
+                CantidadDisponible
+            ) VALUES (
+                @Nombre,
+                @Proveedor,
+                @Presentacion,
+                @CantidadPorPresentacion,
+                @PrecioPresentacion,
+                @CantidadDisponible
+            )
+        `);
 
         console.log(result);
         res.status(201).json({ message: 'Producto creado exitosamente' });

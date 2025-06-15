@@ -7,7 +7,7 @@ import { useApi } from '../../hooks/useApi'
 // RECIBIR TABLESHEMA
 const DataTable = ({ data }) => {
 
-  const excludeValores = ['Rol', 'Estado']
+  const excludeValores = ['Rol', 'Estado', 'CantidadPorPresentacion', 'PrecioUnitarioCalculado']
 
   return (
     <table className={styles.tableCont}>

@@ -27,6 +27,8 @@
     font-weight: 400;
     opacity: .5;
     transition: 500ms;
+
+    cursor: text;
 }
 
 .inpCont input:focus~label,

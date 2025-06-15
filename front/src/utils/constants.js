@@ -45,9 +45,12 @@ export const SHEMA_DB = {
                 { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
                 { name: "Nombre", namedb: "Nombre", type: "string", required: true },
                 { name: "Proveedor", namedb: "Proveedor", type: "string", required: true },
-                { name: "Unidad", namedb: "Unidad", type: "string", required: true },
+                { name: "Presentación", namedb: "Presentacion", type: "string", required: false },
+                { name: "Cantidad por Presentación  g/ml", namedb: "CantidadPorPresentacion", type: "number", required: false },
+                { name: "Precio Presentación", namedb: "PrecioPresentacion", type: "number", required: false },
+                { name: "Precio por g/ml", namedb: "PrecioUnitarioCalculado", type: "number", required: false, readonly: true },
                 { name: "Cantidad Disponible", namedb: "CantidadDisponible", type: "number", required: true },
-                { name: "Precio Unitario", namedb: "PrecioUnitario", type: "number", required: true }
+                { name: "Fecha Actualización", namedb: "FechaActualizacion", type: "date", required: false, readonly: true }
             ],
             showInSlider: true
         },

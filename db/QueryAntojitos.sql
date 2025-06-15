@@ -30,9 +30,18 @@ CREATE TABLE Insumo (
     Id INT PRIMARY KEY IDENTITY,
     Nombre NVARCHAR(100) NOT NULL,
     Proveedor NVARCHAR(100) NOT NULL,
-    Unidad NVARCHAR(20) NOT NULL, 
-    CantidadDisponible DECIMAL(12, 2) DEFAULT 0,
-    PrecioUnitario DECIMAL(10, 2) DEFAULT 0,
+    Presentacion NVARCHAR(50), 
+    CantidadPorPresentacion DECIMAL(10, 2), 
+    
+    PrecioPresentacion DECIMAL(10, 2) DEFAULT 0,
+    PrecioUnitarioCalculado AS ( 
+        CASE 
+            WHEN CantidadPorPresentacion > 0 THEN CAST(PrecioPresentacion / CantidadPorPresentacion AS DECIMAL(10, 2))
+            ELSE 0 
+        END
+    ) PERSISTED, -- se guarda en disco
+
+    CantidadDisponible DECIMAL(12, 2) DEFAULT 0, -- en gramos o ml
     FechaActualizacion DATETIME DEFAULT GETDATE()
 );
 
