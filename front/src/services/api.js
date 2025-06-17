@@ -33,13 +33,17 @@ export const getAllFrom = async (name) => {
 
 export const getById = async (tableSchema, id) => {
     try {
+        console.log("SE EJECUTO GET BY ID CON EL ID: ", id, tableSchema)
         const { namedb } = tableSchema;
         const res = await fetch(`${API_ROUTE}/${namedb.toLowerCase()}/${id}`);
+
+        console.log("RES EN GET BY ID: ", res)
 
         if (!res.ok)
             throw new Error(`-- Error obteniendo por ID ${res.status} ${res.statusText}`);
 
         const data = await res.json();
+        console.log("DATA EN GET BY ID: ", data)
         return data;
     } catch (e) {
         return e;

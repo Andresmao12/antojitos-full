@@ -9,6 +9,11 @@ const DataTable = ({ data, getId }) => {
 
   const excludeValores = ['Rol', 'CantidadPorPresentacion', 'PrecioUnitarioCalculado']
 
+  const handleGetId = (id) => {
+    getId(id)
+    console.log("ID EN DT: ", id)
+  }
+
   return (
     <table className={styles.tableCont}>
       <thead className={styles.tableCont_head}>
@@ -48,7 +53,7 @@ const DataTable = ({ data, getId }) => {
             < td className={styles.register_btnCont} >
               <button className={buttonStyles.searchButton}><i className="fa-solid fa-pen-to-square"></i></button>
               <button className={buttonStyles.deleteButton}><i className="fa-solid fa-trash"></i></button>
-              {getId && <button className={buttonStyles.searchButton} onClick={() => getId(element.Id)}>👁</button>}
+              {getId && <button className={buttonStyles.searchButton} onClick={() => handleGetId(element.Id)}>👁</button>}
             </td>
           </tr>
         )

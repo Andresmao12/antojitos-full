@@ -38,7 +38,7 @@ export const getPedidoById = async (req, res) => {
         WHERE pd.PedidoID = @PedidoID
       `);
 
-        res.json({ pedido: pedido.recordset[0], detalles: detalles.recordset });
+        res.json([{ pedido: pedido.recordset[0], detalles: detalles.recordset }]);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

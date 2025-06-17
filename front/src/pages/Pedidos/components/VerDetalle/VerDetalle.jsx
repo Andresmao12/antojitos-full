@@ -1,18 +1,27 @@
 import { useState, useEffect } from "react";
+import styles from "./VerDetalle.module.css"; // crea este archivo .css
 
-const PedidoDetalle = ({ pedidoId }) => {
+import { useApi } from "../../../../hooks/useApi";
+
+const PedidoDetalle = ({ pedidoId, tableSchema }) => {
+
+    const { fetchById, item } = useApi(tableSchema);
     const [pedido, setPedido] = useState(null);
     const [estado, setEstado] = useState("");
 
     useEffect(() => {
         const fetchPedido = async () => {
-            const res = await fetch(`/api/pedido/${pedidoId}`);
-            const data = await res.json();
-            setPedido(data.pedido);
-            setEstado(data.pedido.Estado);
+            await fetchById(pedidoId);
         };
         fetchPedido();
     }, [pedidoId]);
+
+    useEffect(() => {
+        if (item) {
+            setPedido(item);
+            setEstado(item.Estado);
+        }
+    }, [item]);
 
     const handleActualizarEstado = async () => {
         await fetch(`/api/pedido/${pedidoId}/estado`, {
@@ -23,31 +32,48 @@ const PedidoDetalle = ({ pedidoId }) => {
         alert("Estado actualizado");
     };
 
-    if (!pedido) return <div>Cargando...</div>;
+    if (!pedido) return <div className={styles.loading}>Cargando pedido...</div>;
 
     return (
-        <div>
-            <h2>Pedido #{pedido.Id}</h2>
-            <p><strong>Usuario:</strong> {pedido.NombreUsuario}</p>
-            <p><strong>Fecha:</strong> {new Date(pedido.FechaPedido).toLocaleString()}</p>
+        <div className={styles.detalleCont}>
+            <div className={styles.titleBtnCont}>
+                <h2 className={styles.title}>Pedido #{pedido.Id}</h2>
+                <button onClick={handleActualizarEstado} className={styles.btn}>
+                    Guardar cambios
+                </button>
+            </div>
 
-            <select value={estado} onChange={(e) => setEstado(e.target.value)}>
-                <option value="pendiente">pendiente</option>
-                <option value="preparado">preparado</option>
-                <option value="entregado">entregado</option>
-                <option value="pago">pago</option>
-            </select>
-            <button onClick={handleActualizarEstado}>Guardar cambios</button>
+            <div className={styles.infoBox}>
+                <p><strong>Usuario:</strong> {pedido.NombreUsuario}</p>
+                <p><strong>Fecha:</strong> {new Date(pedido.FechaPedido).toLocaleString()}</p>
 
-            <h3>Productos:</h3>
-            <ul>
-                {pedido.detalles.map((item) => (
-                    <li key={item.Id}>{item.NombreProducto} x {item.Cantidad}</li>
-                ))}
-            </ul>
+                <label className={styles.label}>
+                    Estado:
+                    <select
+                        className={styles.select}
+                        value={estado}
+                        onChange={(e) => setEstado(e.target.value)}
+                    >
+                        <option value="pendiente">pendiente</option>
+                        <option value="preparado">preparado</option>
+                        <option value="entregado">entregado</option>
+                        <option value="pago">pago</option>
+                    </select>
+                </label>
+            </div>
+
+            <div className={styles.productosCont}>
+                <h3>Productos</h3>
+                <ul className={styles.listaProductos}>
+                    {pedido.detalles?.map((item) => (
+                        <li key={item.Id} className={styles.productoItem}>
+                            {item.NombreProducto} x {item.Cantidad}
+                        </li>
+                    ))}
+                </ul>
+            </div>
         </div>
     );
 };
 
-
-export default PedidoDetalle
+export default PedidoDetalle;

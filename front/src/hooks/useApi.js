@@ -33,8 +33,9 @@ export const useApi = (tableSchema) => {
         setLoading(true);
         setError(null);
         try {
-            
+            console.log("SE EJECUTO USE API")
             const result = await getById(tableSchema, id);
+            console.log("RESULTS: ", result)
             setItem(result[0]);
         } catch (err) {
             setError(err.message || err.toString());

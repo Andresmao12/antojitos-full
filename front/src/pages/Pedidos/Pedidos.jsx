@@ -13,10 +13,10 @@ import { useApi } from '../../hooks/useApi'
 
 const Pedidos = () => {
 
-    const tableShema = SHEMA_DB.tables.find(element => element.name?.toLowerCase() === 'pedidos')
-    console.log('TABLESHEMA DESDE PEDIDOS: ', tableShema)
+    const tableSchema = SHEMA_DB.tables.find(element => element.name?.toLowerCase() === 'pedidos')
+    console.log('tableSchema DESDE PEDIDOS: ', tableSchema)
 
-    const { data, fetchAll, fetchById, createItem, updateItem, deleteItem, loading, error, item } = useApi(tableShema)
+    const { data, fetchAll, fetchById, createItem, updateItem, deleteItem, loading, error, item } = useApi(tableSchema)
     const [formData, setFormData] = useState({})
     const [showCreate, setShowCreate] = useState(false)
 
@@ -48,7 +48,7 @@ const Pedidos = () => {
             {detalleId && (
                 <div className={styles.modalOverlay}>
                     <div className={styles.modalContent}>
-                        <PedidoDetalle pedidoId={detalleId} />
+                        <PedidoDetalle pedidoId={detalleId} tableSchema={tableSchema}/>
                         <button onClick={() => setDetalleId(null)} className={buttonStyles.closeButton}>Cerrar</button>
                     </div>
                 </div>
