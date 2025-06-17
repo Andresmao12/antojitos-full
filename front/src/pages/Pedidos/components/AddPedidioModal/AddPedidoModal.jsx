@@ -95,7 +95,8 @@ const AddPedidoModal = ({ handleShowCreate, handleRefresh }) => {
                             <option>Seleccione producto...</option>
                             {dataFrom["Producto"]?.map((producto) => (
                                 <option key={producto.Id} value={producto.Id}>
-                                    {producto.Nombre}
+                                    {console.log(producto)}
+                                    {`${producto.Nombre} ➜ ${producto.Tamanio}`}
                                 </option>
                             ))}
                         </select>
