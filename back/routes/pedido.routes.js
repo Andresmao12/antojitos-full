@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { getAll, getPostreById } from '../controllers/pedido.controller.js';
+import { getAll, getPedidoById, createPedido } from '../controllers/pedido.controller.js';
 
 const PedidoRouter = Router();
 
 PedidoRouter.get('/', getAll);
-// router.get('/:id', getPostreById);
-// router.post('/', createPostre);
+PedidoRouter.get('/:id', getPedidoById);
+PedidoRouter.post('/', createPedido);
 // router.put('/', updatePostre);
 
 export default PedidoRouter;

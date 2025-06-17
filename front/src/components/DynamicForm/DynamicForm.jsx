@@ -9,10 +9,10 @@ import { useApi } from '../../hooks/useApi'
 const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
 
 
+    console.log('tableSchema desde DynamicForm: ', tableSchema)
     const { name: tableName, columns, relations } = tableSchema
     const { createItem, updateItem, loading, error, item } = useApi(tableSchema)
 
-    console.log('tableSchema desde DynamicForm: ', tableSchema)
     const [formData, setFormData] = useState({});
 
     const handleChange = (e) => {

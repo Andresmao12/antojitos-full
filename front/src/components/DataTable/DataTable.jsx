@@ -5,9 +5,9 @@ import buttonStyles from "../../styles/buttons.module.css"
 import { useApi } from '../../hooks/useApi'
 
 // RECIBIR TABLESHEMA
-const DataTable = ({ data }) => {
+const DataTable = ({ data, getId }) => {
 
-  const excludeValores = ['Rol', 'Estado', 'CantidadPorPresentacion', 'PrecioUnitarioCalculado']
+  const excludeValores = ['Rol', 'CantidadPorPresentacion', 'PrecioUnitarioCalculado']
 
   return (
     <table className={styles.tableCont}>
@@ -48,6 +48,7 @@ const DataTable = ({ data }) => {
             < td className={styles.register_btnCont} >
               <button className={buttonStyles.searchButton}><i className="fa-solid fa-pen-to-square"></i></button>
               <button className={buttonStyles.deleteButton}><i className="fa-solid fa-trash"></i></button>
+              {getId && <button className={buttonStyles.searchButton} onClick={() => getId(element.Id)}>👁</button>}
             </td>
           </tr>
         )
