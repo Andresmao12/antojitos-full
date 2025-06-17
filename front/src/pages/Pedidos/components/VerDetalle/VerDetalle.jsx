@@ -8,6 +8,7 @@ const PedidoDetalle = ({ pedidoId, tableSchema }) => {
     const { fetchById, item } = useApi(tableSchema);
     const [pedido, setPedido] = useState(null);
     const [estado, setEstado] = useState("");
+    const [detalles, setDetalles] = useState([]);
 
     useEffect(() => {
         const fetchPedido = async () => {
@@ -17,8 +18,10 @@ const PedidoDetalle = ({ pedidoId, tableSchema }) => {
     }, [pedidoId]);
 
     useEffect(() => {
+        console.log("ITEM EN USEE: ", item)
         if (item) {
-            setPedido(item);
+            setPedido(item.pedido);
+            setDetalles(item.detalles);
             setEstado(item.Estado);
         }
     }, [item]);
@@ -65,7 +68,7 @@ const PedidoDetalle = ({ pedidoId, tableSchema }) => {
             <div className={styles.productosCont}>
                 <h3>Productos</h3>
                 <ul className={styles.listaProductos}>
-                    {pedido.detalles?.map((item) => (
+                    {detalles?.map((item) => (
                         <li key={item.Id} className={styles.productoItem}>
                             {item.NombreProducto} x {item.Cantidad}
                         </li>
