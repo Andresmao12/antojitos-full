@@ -61,6 +61,7 @@
 .cardPostres {
     background-color: #ffffff;
     color: #333;
+    min-height: 200px;
 }
 
 .cardPostres {
