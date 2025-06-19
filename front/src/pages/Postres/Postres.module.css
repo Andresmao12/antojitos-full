@@ -140,3 +140,7 @@
     height: 80%;
     width: 20%;
 }
+
+.msgWithoutData{
+    text-align: center;
+}

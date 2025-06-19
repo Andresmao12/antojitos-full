@@ -11,6 +11,7 @@ const Sidebar = () => {
                 <h2 className={styles.title}>antojitos</h2>
             </div>
             <nav className={styles.nav}>
+                <NavLink to={`/dashboard`} className={styles.link}>Dashboard</NavLink>
                 {
                     SHEMA_DB.tables.map((element, i) => {
 

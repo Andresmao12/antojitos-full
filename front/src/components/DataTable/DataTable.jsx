@@ -13,6 +13,8 @@ const DataTable = ({ data, getId }) => {
     getId(id)
     console.log("ID EN DT: ", id)
   }
+  console.log("DATA MS", data)
+  if (!data || data?.length == 0) return <span className={styles.msgWithoutData}>Por aca no hay informacion</span>
 
   return (
     <table className={styles.tableCont}>
@@ -43,12 +45,26 @@ const DataTable = ({ data, getId }) => {
           // Td por cada uno de los datos
           < tr key={index} className={styles.register} >
             {
-              Object.entries(element).map(([key, element], index) =>
-                excludeValores.includes(key) ?
-                  null
-                  :
-                  <td className={styles.register_data}>{element}</td>
-              )
+              Object.entries(element).map(([key, value], index) => {
+                if (excludeValores.includes(key)) return null;
+
+                if (key.toLowerCase().includes("fecha")) {
+
+                  const fecha = typeof value === 'string' ? value.replace(/Z$/, '') : value;
+
+                  return (
+                    <td key={index} className={styles.register_data}>
+                      {new Date(fecha).toLocaleString("es-CO").replace(",", " →")}
+                    </td>
+                  );
+                }
+
+                return (
+                  <td key={index} className={styles.register_data}>
+                    {value}
+                  </td>
+                );
+              })
             }
             < td className={styles.register_btnCont} >
               <button className={buttonStyles.searchButton}><i className="fa-solid fa-pen-to-square"></i></button>

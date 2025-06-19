@@ -16,7 +16,9 @@ import UserRouter from './routes/user.routes.js'
 import pedidoRouter from './routes/pedido.routes.js'
 import InsumoRouter from './routes/insumo.routes.js'
 import Prod_insumRouter from './routes/prod_insum.routes.js'
+import DashboardRouter from './routes/dashboard.routes.js'
 
+app.use('/api/dashboard', DashboardRouter);
 app.use('/api/producto', ProductRouter);
 app.use('/api/usuario', UserRouter);
 app.use('/api/pedido', pedidoRouter);

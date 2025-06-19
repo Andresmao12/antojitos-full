@@ -1,0 +1,167 @@
+.dashboard {
+    padding: 2rem;
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+.dashboard h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #2c3e50;
+}
+
+.cardSection {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
+/* Tarjeta base */
+.card,
+.cardPostres {
+    background-color: white;
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+}
+
+/* Colores por tipo */
+.pendiente {
+    background: linear-gradient(135deg, #fcd34d, #fbbf24);
+}
+
+.preparado {
+    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+}
+
+.entregado {
+    background: linear-gradient(135deg, #34d399, #10b981);
+}
+
+.ingresos {
+    background: linear-gradient(135deg, #4ade80, #22c55e);
+}
+
+.egresos {
+    background: linear-gradient(135deg, #f87171, #ef4444);
+}
+
+.cardSimple,
+.cardPostres {
+    background-color: #ffffff;
+    color: #333;
+}
+
+.cardPostres {
+
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.card p,
+.card li {
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.card ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.card li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.card li:last-child {
+    border-bottom: none;
+}
+
+
+.postresGrid {
+    display: grid;
+    /* grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); */
+    gap: 1rem;
+}
+
+.postreCard {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #6366f1;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease;
+}
+
+.postreCard:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.postreCard h4 {
+    margin: 0;
+    color: #374151;
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+
+.cardInsFaltantes
+
+/* .cardPostres  */
+    {
+    height: 40%;
+    overflow-y: auto;
+}
+
+
+
+
+.postreCard {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-left: 4px solid #6366f1;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.postreCard:hover {
+    transform: translateY(-3px);
+}
+
+.postreCard.checked {
+    border-left-color: #10b981;
+    background-color: #ecfdf5;
+}
+
+.checkIcon {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.75rem;
+    font-size: 1.25rem;
+    color: #10b981;
+    font-weight: bold;
+}

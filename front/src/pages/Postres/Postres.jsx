@@ -56,12 +56,15 @@ const Postres = () => {
         {/* {showCreate && <DynamicForm tableShema={tableShema} regiterData={formData} showCreate={handleShowCreate} />} */}
         {showCreate && <AddPostreModal handleShowModal={handleShowCreate} handleRefresh={handleRefresh} />}
 
-        <div className={styles.cardCont}>
-            {Array.isArray(data) &&
-                data.map((element, i) =>
-                    <PostreCard key={i} id={element.Id} title={element.Nombre} desc={element.Descripcion} img={element.UrlImagen} tableShema={tableShema} />
-                )}
-        </div>
+        {(!data || data?.length == 0) ?
+            <span className={styles.msgWithoutData}>Por aca no hay informacion</span>
+            :
+            <div className={styles.cardCont}>
+                {Array.isArray(data) &&
+                    data.map((element, i) =>
+                        <PostreCard key={i} id={element.Id} title={element.Nombre} desc={element.Descripcion} img={element.UrlImagen} tableShema={tableShema} />
+                    )}
+            </div>}
     </>
     )
 }

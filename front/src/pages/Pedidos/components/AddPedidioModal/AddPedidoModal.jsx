@@ -103,10 +103,10 @@ const AddPedidoModal = ({ handleShowCreate, handleRefresh }) => {
                     </div>
                     <div className={styles.inpCont}>
                         <input
+                            id='producto-cantidad'
                             name="producto-cantidad"
                             type="number"
                             min="1"
-                            required
                             placeholder=" "
                             onChange={handleChange}
                             value={formData["producto-cantidad"] || ''}
