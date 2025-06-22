@@ -7,8 +7,6 @@ export const getAll = async (req, res) => {
         console.log(result.recordset)
         res.json(result.recordset);
 
-
-
     } catch (error) {
         console.error('-- Error al obtener productos:', error);
         res.status(500).json({ error: 'Error al obtener los pedidos' });
@@ -44,11 +42,9 @@ export const getPedidoById = async (req, res) => {
     }
 };
 
-
 export const createPedido = async (req, res) => {
     const { UsuarioID, productos } = req.body;
-
-    console.log("min: ", UsuarioID, "body: ", req.body)
+    console.log("min: ", UsuarioID, "body: ", req.body);
 
     const pool = await sql.connect(config);
     const transaction = new sql.Transaction(pool);
@@ -69,6 +65,13 @@ export const createPedido = async (req, res) => {
         const pedidoId = pedidoResult.recordset[0].Id;
         console.log('Pedido creado con ID:', pedidoId);
 
+        // Obtener insumos compuestos y su composición
+        const insumosCompuestosRes = await transaction.request().query(`SELECT Id FROM Insumo WHERE Compuesto = 1`);
+        const idsCompuestos = insumosCompuestosRes.recordset.map(row => row.Id);
+
+        const composicionesRes = await transaction.request().query(`SELECT * FROM Insumo_Composicion`);
+        const composiciones = composicionesRes.recordset;
+
         // 2. Procesar cada producto
         for (const item of productos) {
             const productoId = parseInt(item.ProductoID);
@@ -79,8 +82,7 @@ export const createPedido = async (req, res) => {
             }
 
             // 2.1 Insertar detalle del pedido
-            const detalleRequest = new sql.Request(transaction);
-            await detalleRequest
+            await transaction.request()
                 .input('PedidoID', sql.Int, pedidoId)
                 .input('ProductoID', sql.Int, productoId)
                 .input('Cantidad', sql.Decimal(12, 2), cantidad)
@@ -90,8 +92,7 @@ export const createPedido = async (req, res) => {
                 `);
 
             // 2.2 Consultar insumos para este producto
-            const insumoRequest = new sql.Request(transaction);
-            const insumosResult = await insumoRequest
+            const insumosResult = await transaction.request()
                 .input('ProdID', sql.Int, productoId)
                 .query(`
                     SELECT InsumoID, CantidadUsada
@@ -99,34 +100,60 @@ export const createPedido = async (req, res) => {
                     WHERE ProductoID = @ProdID
                 `);
 
-            // 2.3 Actualizar stock de insumos y registrar en logs
             for (const insumo of insumosResult.recordset) {
                 const cantidadTotal = insumo.CantidadUsada * cantidad;
 
-                // Actualizar stock
-                const stockRequest = new sql.Request(transaction);
-                await stockRequest
-                    .input('InsumoID', sql.Int, insumo.InsumoID)
-                    .input('Cantidad', sql.Decimal(12, 2), cantidadTotal)
-                    .query(`
-                        UPDATE Insumo
-                        SET CantidadDisponible = CantidadDisponible - @Cantidad,
-                            FechaActualizacion = GETDATE()
-                        WHERE Id = @InsumoID
-                    `);
+                if (idsCompuestos.includes(insumo.InsumoID)) {
+                    // Es compuesto, expandir ingredientes
+                    const ingredientes = composiciones.filter(c => c.InsumoCompuestoID === insumo.InsumoID);
 
-                // Insertar log
-                const logRequest = new sql.Request(transaction);
-                await logRequest
-                    .input('InsumoID', sql.Int, insumo.InsumoID)
-                    .input('UsuarioID', sql.Int, UsuarioID)
-                    .input('TipoMovimiento', sql.NVarChar, 'salida')
-                    .input('Cantidad', sql.Decimal(12, 2), cantidadTotal)
-                    .input('Motivo', sql.NVarChar, `Producción del producto ID ${productoId} (pedido ${pedidoId})`)
-                    .query(`
-                        INSERT INTO Log_Insumo (InsumoID, UsuarioID, TipoMovimiento, Cantidad, Motivo)
-                        VALUES (@InsumoID, @UsuarioID, @TipoMovimiento, @Cantidad, @Motivo)
-                    `);
+                    for (const ing of ingredientes) {
+                        const cantidadFinal = cantidadTotal * ing.CantidadPorGramo;
+
+                        await transaction.request()
+                            .input('InsumoID', sql.Int, ing.IngredienteID)
+                            .input('Cantidad', sql.Decimal(12, 2), cantidadFinal)
+                            .query(`
+                                UPDATE Insumo
+                                SET CantidadDisponible = CantidadDisponible - @Cantidad,
+                                    FechaActualizacion = GETDATE()
+                                WHERE Id = @InsumoID
+                            `);
+
+                        await transaction.request()
+                            .input('InsumoID', sql.Int, ing.IngredienteID)
+                            .input('UsuarioID', sql.Int, UsuarioID)
+                            .input('TipoMovimiento', sql.NVarChar, 'salida')
+                            .input('Cantidad', sql.Decimal(12, 2), cantidadFinal)
+                            .input('Motivo', sql.NVarChar, `Producción del producto ID ${productoId} (pedido ${pedidoId})`)
+                            .query(`
+                                INSERT INTO Log_Insumo (InsumoID, UsuarioID, TipoMovimiento, Cantidad, Motivo)
+                                VALUES (@InsumoID, @UsuarioID, @TipoMovimiento, @Cantidad, @Motivo)
+                            `);
+                    }
+                } else {
+                    // No compuesto, descontar normalmente
+                    await transaction.request()
+                        .input('InsumoID', sql.Int, insumo.InsumoID)
+                        .input('Cantidad', sql.Decimal(12, 2), cantidadTotal)
+                        .query(`
+                            UPDATE Insumo
+                            SET CantidadDisponible = CantidadDisponible - @Cantidad,
+                                FechaActualizacion = GETDATE()
+                            WHERE Id = @InsumoID
+                        `);
+
+                    await transaction.request()
+                        .input('InsumoID', sql.Int, insumo.InsumoID)
+                        .input('UsuarioID', sql.Int, UsuarioID)
+                        .input('TipoMovimiento', sql.NVarChar, 'salida')
+                        .input('Cantidad', sql.Decimal(12, 2), cantidadTotal)
+                        .input('Motivo', sql.NVarChar, `Producción del producto ID ${productoId} (pedido ${pedidoId})`)
+                        .query(`
+                            INSERT INTO Log_Insumo (InsumoID, UsuarioID, TipoMovimiento, Cantidad, Motivo)
+                            VALUES (@InsumoID, @UsuarioID, @TipoMovimiento, @Cantidad, @Motivo)
+                        `);
+                }
             }
         }
 
