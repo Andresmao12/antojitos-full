@@ -22,43 +22,63 @@ export const getUserById = (req, res) => {
 };
 
 export const createInsumo = async (req, res) => {
-    const { Nombre, Proveedor, Presentacion, CantidadPorPresentacion, PrecioPresentacion, CantidadDisponible } = req.body;
+    const {
+        Nombre,
+        Proveedor,
+        Presentacion,
+        CantidadPorPresentacion,
+        PrecioPresentacion,
+        Compuesto,
+        CantidadDisponible = 0,
+        ingredientes = [],
+    } = req.body;
+
+    const pool = await sql.connect(config);
+    
+    const transaction = new sql.Transaction(pool);
 
     try {
-        const pool = await sql.connect(config);
+        await transaction.begin();
 
-        const result = await pool.request()
-            .input('Nombre', sql.VarChar, Nombre)
-            .input('Proveedor', sql.VarChar, Proveedor)
-            .input('Presentacion', sql.VarChar, Presentacion)
-            .input('CantidadPorPresentacion', sql.Decimal(10, 2), CantidadPorPresentacion)
-            .input('PrecioPresentacion', sql.Decimal(10, 2), PrecioPresentacion)
-            .input('CantidadDisponible', sql.Decimal(12, 2), CantidadDisponible)
-            .query(`
-            INSERT INTO Insumo (
-                Nombre,
-                Proveedor,
-                Presentacion,
-                CantidadPorPresentacion,
-                PrecioPresentacion,
-                CantidadDisponible
-            ) VALUES (
-                @Nombre,
-                @Proveedor,
-                @Presentacion,
-                @CantidadPorPresentacion,
-                @PrecioPresentacion,
-                @CantidadDisponible
-            )
-        `);
+        const request = transaction.request();
+        request.input("Nombre", sql.NVarChar(100), Nombre);
+        request.input("Proveedor", sql.NVarChar(100), Proveedor);
+        request.input("Presentacion", sql.NVarChar(50), Presentacion);
+        request.input("CantidadPorPresentacion", sql.Decimal(10, 2), CantidadPorPresentacion);
+        request.input("PrecioPresentacion", sql.Decimal(10, 2), PrecioPresentacion);
+        request.input("Compuesto", sql.Bit, Compuesto);
+        request.input("CantidadDisponible", sql.Decimal(12, 2), CantidadDisponible);
 
-        console.log(result);
-        res.status(201).json({ message: 'Producto creado exitosamente' });
+        const result = await request.query(`
+      INSERT INTO Insumo (
+        Nombre, Proveedor, Presentacion, CantidadPorPresentacion,
+        PrecioPresentacion, Compuesto, CantidadDisponible
+      ) 
+      OUTPUT INSERTED.Id AS nuevoId
+      VALUES (@Nombre, @Proveedor, @Presentacion, @CantidadPorPresentacion, @PrecioPresentacion, @Compuesto, @CantidadDisponible)
+    `);
 
-        ;
-    } catch (error) {
-        console.error('-- Error al crear Producto:', error);
-        res.status(500).json({ error: 'Error al crear el Producto' });
+        const nuevoId = result.recordset[0].nuevoId;
+
+        if (Compuesto && ingredientes.length > 0) {
+            for (const ing of ingredientes) {
+                await transaction.request()
+                    .input("InsumoCompuestoID", sql.Int, nuevoId)
+                    .input("IngredienteID", sql.Int, ing.insumoId)
+                    .input("CantidadPorGramo", sql.Decimal(10, 4), ing.cantidadPorGramo)
+                    .query(`
+            INSERT INTO Insumo_Composicion (InsumoCompuestoID, IngredienteID, CantidadPorGramo)
+            VALUES (@InsumoCompuestoID, @IngredienteID, @CantidadPorGramo)
+          `);
+            }
+        }
+
+        await transaction.commit();
+        res.status(201).json({ message: "Insumo creado correctamente", id: nuevoId });
+    } catch (err) {
+        await transaction.rollback();
+        console.error("Error creando insumo:", err);
+        res.status(500).json({ error: "Error creando insumo" });
     }
 };
 

@@ -34,6 +34,7 @@ CREATE TABLE Insumo (
     CantidadPorPresentacion DECIMAL(10, 2), 
     
     PrecioPresentacion DECIMAL(10, 2) DEFAULT 0,
+    Compuesto BIT,
     PrecioUnitarioCalculado AS ( 
         CASE 
             WHEN CantidadPorPresentacion > 0 THEN CAST(PrecioPresentacion / CantidadPorPresentacion AS DECIMAL(10, 2))
@@ -43,6 +44,7 @@ CREATE TABLE Insumo (
 
     CantidadDisponible DECIMAL(12, 2) DEFAULT 0, -- en gramos o ml
     FechaActualizacion DATETIME DEFAULT GETDATE()
+
 );
 
 
@@ -54,7 +56,7 @@ CREATE TABLE Producto (
     Tamanio NVARCHAR(10),
     DatosProceso NVARCHAR(4000),
     PrecioVenta DECIMAL(10, 2) NOT NULL,
-    FechaCreacion DATETIME DEFAULT GETDATE()
+    FechaCreacion DATETIME DEFAULT GETDATE(),
 );
 
 
@@ -67,6 +69,14 @@ CREATE TABLE Producto_Insumo (
     FOREIGN KEY (InsumoID) REFERENCES Insumo(Id)
 );
 
+CREATE TABLE Insumo_Composicion (
+    InsumoCompuestoID INT NOT NULL, 
+    IngredienteID INT NOT NULL,     
+    CantidadPorGramo DECIMAL(10, 4),
+    PRIMARY KEY (InsumoCompuestoID, IngredienteID),
+    FOREIGN KEY (InsumoCompuestoID) REFERENCES Insumo(Id),
+    FOREIGN KEY (IngredienteID) REFERENCES Insumo(Id)
+);
 
 CREATE TABLE Pedido (
     Id INT PRIMARY KEY IDENTITY,
@@ -86,7 +96,6 @@ CREATE TABLE Pedido_Detalle (
 CREATE TABLE Factura (
     Id INT PRIMARY KEY IDENTITY,
     PedidoID INT FOREIGN KEY REFERENCES Pedido(Id),
-    UsuarioID INT FOREIGN KEY REFERENCES Usuario(Id),
     FechaFactura DATETIME DEFAULT GETDATE(),
     Total DECIMAL(10, 2) NOT NULL,
     MetodoPago NVARCHAR(50) NOT NULL,
@@ -107,3 +116,13 @@ CREATE TABLE Log_Insumo (
 CREATE INDEX idx_fecha_pedido ON Pedido(FechaPedido);
 CREATE INDEX idx_estado_pedido ON Pedido(Estado);
 CREATE INDEX idx_factura_estado ON Factura(Estado);
+
+
+INSERT INTO Rol (Nombre)
+VALUES 
+('Administrador'),
+('Empleado'),
+('Cliente'),
+('Repartidor'),
+('Supervisor');
+

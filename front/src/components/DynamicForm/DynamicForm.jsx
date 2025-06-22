@@ -6,7 +6,7 @@ import buttonStyles from '../../styles/buttons.module.css'
 import { useApi } from '../../hooks/useApi'
 
 
-const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
+const DynamicForm = ({ tableSchema, regiterData, showCreate, handleRefresh }) => {
 
 
     console.log('tableSchema desde DynamicForm: ', tableSchema)
@@ -20,10 +20,7 @@ const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleShowCreate = () => {
-        showCreate(!showCreate)
-    }
-    const handleCreate = (e) => {
+    const handleCreate = async (e) => {
         e.preventDefault();
 
         const dataConDefaults = {};
@@ -35,7 +32,9 @@ const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
             dataConDefaults[namedb] = (valor !== undefined && valor !== '') ? valor : valueDefault;
         });
 
-        createItem(dataConDefaults)
+        await createItem(dataConDefaults)
+        await handleRefresh()
+        showCreate()
     }
 
     return (
@@ -87,7 +86,7 @@ const DynamicForm = ({ tableSchema, regiterData, showCreate }) => {
             {/* {relations && relations.map((relation) => {})} */}
 
             <div className={styles.btnGroup}>
-                <button type='button' className={`${buttonStyles.deleteButton} ${styles.submitCreateBtn}`} onClick={handleShowCreate}>Cerrar</button>
+                <button type='button' className={`${buttonStyles.deleteButton} ${styles.submitCreateBtn}`} onClick={showCreate}>Cerrar</button>
                 <button type="submit" className={`${buttonStyles.searchButton} ${styles.submitCreateBtn}`}>Guardar {tableName}</button>
             </div>
         </form>

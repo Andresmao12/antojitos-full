@@ -29,6 +29,12 @@ const Clientes = () => {
     useEffect(() => { fetchAll() }, []);
 
     const handleShowCreate = () => setShowCreate(!showCreate)
+    
+    const handleRefresh = async () => {
+        console.log("SE REFRESCO CORRECTAMENTE")
+        await fetchAll()
+        setShowCreate(false)
+    }
 
     return (
         <>
@@ -36,7 +42,7 @@ const Clientes = () => {
                 <SearchInput />
                 <button className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleShowCreate}>Añadir</button>
             </div>
-            {showCreate && <DynamicForm tableSchema={tableSchema} regiterData={formData} showCreate={handleShowCreate} />}
+            {showCreate && <DynamicForm tableSchema={tableSchema} regiterData={formData} showCreate={handleShowCreate} handleRefresh={handleRefresh} />}
             <div className={styles.registersCont}>
                 <DataTable data={data} />
             </div>

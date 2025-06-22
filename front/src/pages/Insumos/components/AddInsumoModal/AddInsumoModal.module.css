@@ -1,0 +1,308 @@
+.modalOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.formCont {
+
+    width: 90%;
+    max-width: 600px;
+    max-height: 90%;
+    overflow-y: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+
+    /* background-color: var(--bg-color); */
+    background-color: #fff8f0;
+    padding: 2rem;
+    border-radius: 10px;
+    z-index: 100;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+
+    & h2 {
+        color: #8b4513;
+    }
+}
+
+
+.btnCloseModal {
+    position: absolute;
+    height: min-content;
+    right: 2.2em;
+    top: 1.6em;
+
+    font-size: 1.5em;
+}
+
+
+.inpCont {
+    display: flex;
+    align-items: center;
+
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin-top: 1em;
+}
+
+
+.inpCont label {
+    position: absolute;
+    left: 1em;
+    font-weight: 400;
+    opacity: .5;
+    cursor: text;
+    transition: 500ms;
+}
+
+
+.inpCont input:focus~label,
+.inpCont input:not(:placeholder-shown)~label {
+    top: -45%;
+    left: 0;
+
+    font-size: 14px;
+    opacity: .8;
+}
+
+
+.inpCont input {
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    color: #000;
+    outline: none;
+    border: 2px solid rgba(0, 0, 0, 0.1);
+    font-size: 16px;
+    padding: 20px 45px 20px 20px;
+    border-radius: 40px;
+}
+
+
+.inpCont input:focus {
+    border-color: var(--text-color-aux);
+}
+
+
+.inpGroup {
+    width: 100%;
+    height: min-content;
+    display: grid;
+    grid-template-columns: min-content;
+    grid-template-columns: 3fr 2fr 1fr;
+    grid-auto-rows: min-content;
+    align-items: end;
+    gap: .8em;
+
+
+    & *:last-child {
+        /* height: min-content;
+        width: min-content;
+        padding: 1em 2em; */
+    }
+}
+
+.select {
+    height: 70%;
+    border-radius: 5px;
+}
+
+
+.datosProcesoCont {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background-color: #fff8f0;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    display: flex;
+    flex-direction: column;
+    gap: 1.3em;
+
+    & :is(h2, h3) {
+        color: #8b4513;
+
+    }
+}
+
+.ingredientesList {
+    list-style: disc;
+    padding-left: 1.5rem;
+    color: #333;
+}
+
+.ingrentesSection,
+.capasSection,
+.notasSection {
+    display: flex;
+    flex-direction: column;
+    gap: .5em;
+}
+
+.capasContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.capaItem {
+    background: #f4e4d5;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+}
+
+.notas {
+    margin-top: 0.5rem;
+    font-style: italic;
+    background: #fff1e6;
+    padding: 0.75rem;
+    border-left: 4px solid #ffa500;
+    border-radius: 4px;
+}
+
+.itemAddCont {
+    width: 100%;
+    border: 1px solid red;
+    height: 10px;
+}
+
+
+.addButton {
+
+    height: 80%;
+    font-size: 25px;
+
+}
+
+.ingredienteCont {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+
+    padding: .5em;
+    border-radius: 10px;
+    box-shadow: 0 0 4px -1px var(--tertiary-color);
+}
+
+.ingredientesCont {
+    height: max-content;
+    /* max-height: 150px;
+    overflow-y: auto; */
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    padding: .5em;
+    border-radius: 10px;
+    /* background-color: var(--cuartiary-color); */
+    background-color: #f4e4d5;
+}
+
+
+/* ESTILOS SELECTS */
+.select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 16px;
+
+    position: relative;
+
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.selectCont {
+    position: relative;
+}
+
+/* flechita personalizada */
+.selectCont::after {
+    content: "▼";
+
+    font-size: 10px;
+    color: #666;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.select:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    outline: none;
+}
+
+
+
+
+.checkboxWrapper {
+    margin: 1rem 0;
+}
+
+.switchLabel {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.switchInput {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: background-color 0.3s;
+}
+
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.switchInput:checked+.slider {
+    background-color: #4caf50;
+}
+
+.switchInput:checked+.slider::before {
+    transform: translateX(20px);
+}

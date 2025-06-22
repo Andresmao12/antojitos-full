@@ -7,8 +7,6 @@ export const getAll = async (req, res) => {
         console.log(result.recordset)
         res.json(result.recordset);
 
-
-
     } catch (error) {
         console.error('-- Error al obtener productos:', error);
         res.status(500).json({ error: 'Error al obtener los productos' });

@@ -132,13 +132,12 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                             className={styles.select}
                             name={`ingrediente`}
                             placeholder=" "
-                            required
                             onChange={handleChange}
                             value={formData[`ingrediente`] || ''}
                         >
                             <option>Seleccione...</option>
                             {(dataFrom["Insumo"]?.length > 0) && dataFrom['Insumo']?.map((insumo, idx) => (
-                                <option key={idx} value={insumo.Id}>{insumo.Nombre}</option>
+                                <option key={idx} value={insumo.Id}>{insumo.Nombre} - {insumo.Proveedor}</option>
                             ))}
                         </select>
                     </div>
@@ -148,7 +147,6 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                             name="ingrediente-cantidad"
                             type='number'
                             placeholder=" "
-                            required
                             onChange={handleChange}
                         // value={formData[namedb] || ''}
                         />

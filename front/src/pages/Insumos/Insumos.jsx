@@ -7,8 +7,9 @@ import DataTable from '../../components/DataTable/DataTable'
 import SearchInput from '../../components/SearchInput/SearchInput'
 import DynamicForm from "../../components/DynamicForm/DynamicForm"
 
+import AddInsumoModal from "./components/AddInsumoModal/AddInsumoModal"
 
-import { SHEMA_DB } from '../../utils/constants'
+import { SHEMA_DB } from '../../utils/constants.js'
 import { useApi } from '../../hooks/useApi'
 
 
@@ -29,14 +30,19 @@ const Insumos = () => {
     useEffect(() => { fetchAll() }, []);
 
     const handleShowCreate = () => setShowCreate(!showCreate)
-
+    
+    const handleRefresh = async () => {
+        console.log("SE REFRESCO CORRECTAMENTE")
+        await fetchAll()
+        setShowCreate(false)
+    }
     return (
         <>
             <div className={styles.searchAddCont}>
                 <SearchInput />
                 <button className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleShowCreate}>Añadir</button>
             </div>
-            {showCreate && <DynamicForm tableSchema={tableShema} regiterData={formData} showCreate={handleShowCreate} />}
+            {showCreate && <AddInsumoModal tableSchema={tableShema} handleShowModal={handleShowCreate} handleRefresh={handleRefresh} />}
             <div className={styles.registersCont}>
                 <DataTable data={data} />
             </div>

@@ -25,7 +25,7 @@ const Dashboard = () => {
                 console.log("Dashboard data:", result);
                 setData(result);
 
-                fetchAll("insumo")
+                fetchAll("Insumo")
             } catch (error) {
                 console.error("Error cargando dashboard:", error);
             }
@@ -77,6 +77,8 @@ const Dashboard = () => {
         return acc;
     }, {});
 
+    // if (!data || !dataFrom["Insumo"]) return <div>Cargando dashboard...</div>;
+
     return (
         <div className={styles.dashboard}>
             <h1>Dashboard</h1>
@@ -111,11 +113,16 @@ const Dashboard = () => {
                 <div className={`${styles.card} ${styles.cardSimple} ${styles.cardInsFaltantes}`}>
                     <h3>Insumos requeridos (pendientes)</h3>
                     <ul>
-                        {insumosRequeridos.map(insumo => (
-                            <li key={insumo.InsumoID}>
-                                ID {dataFrom["Insumo"]}: {insumo.CantidadTotal}
-                            </li>
-                        ))}
+                        {insumosRequeridos.map((insumo) => {
+                            const info = dataFrom["Insumo"]?.find(i => i.Id === insumo.InsumoID)
+                            console.log("DATAFROM INSUMO: ", dataFrom["Insumo"])
+                            console.log("INFO INSUMO: ", info)
+                            return (
+                                <li key={insumo.InsumoID}>
+                                    {info ? `${info.Nombre}: ${insumo.CantidadTotal} ` : `ID ${insumo.InsumoID}: ${insumo.CantidadTotal}`}
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
                 <div className={styles.cardPostres}>
