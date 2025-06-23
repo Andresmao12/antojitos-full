@@ -253,3 +253,30 @@
     box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
     outline: none;
 }
+
+.imageDropZone {
+  border: 2px dashed #bbb;
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+  background-color: #f9f9f9;
+  margin-bottom: 1rem;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.imageDropZone:hover {
+  background-color: #f1f1f1;
+}
+
+.imageDropZone input[type="file"] {
+  margin-top: 0.5rem;
+}
+
+.imagePreview {
+  margin-top: 1rem;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}

@@ -36,6 +36,8 @@ export const getPostreById = async (req, res) => {
 export const createPostre = async (req, res) => {
     const { Nombre, UrlImagen, Descripcion, Tamanio, DatosProceso, PrecioVenta, insumos } = req.body;
 
+    console.log("DATOS DEL PRODUCTO: ----->", JSON.stringify(req.body))
+
     console.log("DATOS PROCESOOOOO: ----->", JSON.stringify(DatosProceso))
 
     try {
