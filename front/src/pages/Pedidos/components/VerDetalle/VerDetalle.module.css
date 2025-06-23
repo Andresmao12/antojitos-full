@@ -106,3 +106,34 @@
 
     font-size: 1.5em;
 }
+
+
+
+
+
+.estadoSelector {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+
+.estadoBtn {
+  padding: 0.4rem 0.8rem;
+  border: 1px solid #ccc;
+  background-color: white;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.estadoBtn:hover {
+  background-color: #f0f0f0;
+}
+
+.estadoBtn.active {
+  background-color: var(--primary-color);
+  color: white;
+  border-color:  var(--secondary-color);
+}

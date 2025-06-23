@@ -115,11 +115,10 @@ const Dashboard = () => {
                     <ul>
                         {insumosRequeridos.map((insumo) => {
                             const info = dataFrom["Insumo"]?.find(i => i.Id === insumo.InsumoID)
-                            console.log("DATAFROM INSUMO: ", dataFrom["Insumo"])
-                            console.log("INFO INSUMO: ", info)
+
                             return (
                                 <li key={insumo.InsumoID}>
-                                    {info ? `${info.Nombre}: ${Math.round(insumo.CantidadTotal)} ` : `ID ${insumo.InsumoID}: ${Math.round(insumo.CantidadTotal)}`}
+                                    {info ? `${info.Nombre}: ${Math.round(insumo.CantidadTotal)}g` : `ID ${insumo.InsumoID}: ${Math.round(insumo.CantidadTotal)}g`}
                                 </li>
                             );
                         })}

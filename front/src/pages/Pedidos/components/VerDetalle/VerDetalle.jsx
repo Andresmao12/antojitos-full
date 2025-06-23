@@ -4,7 +4,7 @@ import buttonStyles from '../../../../styles/buttons.module.css'
 
 import { useApi } from "../../../../hooks/useApi";
 
-const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle }) => {
+const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle , handleRefresh }) => {
 
     const { fetchById, item, updateItem } = useApi(tableSchema);
 
@@ -32,11 +32,10 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle }) => {
     const handleActualizarEstado = async () => {
         try {
             console.log("Actualizando estado: ", pedidoId, estado)
-            await updateItem(pedidoId, {Estado : estado});
-            alert("Estado actualizado");
+            await updateItem(pedidoId, { Estado: estado });
+            handleRefresh();
         } catch (err) {
             console.error("Error al actualizar estado:", err);
-            alert("Error actualizando el estado");
         }
         handleShowDetalle(null);
     };
@@ -67,19 +66,18 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle }) => {
                     <p><strong>Usuario:</strong> {pedido.NombreUsuario}</p>
                     <p><strong>Fecha:</strong> {new Date(pedido.FechaPedido).toLocaleString()}</p>
 
-                    <label className={styles.label}>
-                        Estado:
-                        <select
-                            className={styles.select}
-                            value={estado}
-                            onChange={(e) => setEstado(e.target.value)}
-                        >
-                            <option value="pendiente">pendiente</option>
-                            <option value="preparado">preparado</option>
-                            <option value="entregado">entregado</option>
-                            <option value="cancelado">cancelado</option>
-                        </select>
-                    </label>
+                    <div className={styles.estadoSelector}>
+                        {['pendiente', 'en preparacion', 'entregado', 'cancelado'].map((opcion) => (
+                            <button
+                                key={opcion}
+                                className={`${styles.estadoBtn} ${estado === opcion ? styles.active : ''}`}
+                                onClick={() => setEstado(opcion)}
+                                type="button"
+                            >
+                                {opcion}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 <div className={styles.productosCont}>

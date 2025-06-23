@@ -44,8 +44,8 @@ const Pedidos = () => {
                 <button className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleShowCreate}>Añadir</button>
             </div>
             {showCreate && <AddPedidoModal handleShowCreate={handleShowCreate} handleRefresh={handleRefresh} />}
-            {detalleId && <PedidoDetalle pedidoId={detalleId} tableSchema={tableSchema}  handleShowDetalle={handleVerDetalle} />}
-            
+            {detalleId && <PedidoDetalle pedidoId={detalleId} tableSchema={tableSchema} handleShowDetalle={handleVerDetalle} handleRefresh={handleRefresh} />}
+
             <div className={styles.registersCont}>
                 <DataTable data={data} getId={handleVerDetalle} />
             </div>
