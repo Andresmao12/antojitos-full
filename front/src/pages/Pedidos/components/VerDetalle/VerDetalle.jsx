@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
-import styles from "./VerDetalle.module.css"; // crea este archivo .css
+import styles from "./VerDetalle.module.css";
+import buttonStyles from '../../../../styles/buttons.module.css'
 
 import { useApi } from "../../../../hooks/useApi";
 
-const PedidoDetalle = ({ pedidoId, tableSchema }) => {
+const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle }) => {
 
-    const { fetchById, item } = useApi(tableSchema);
+    const { fetchById, item, updateItem } = useApi(tableSchema);
+
     const [pedido, setPedido] = useState(null);
     const [estado, setEstado] = useState("");
     const [detalles, setDetalles] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const [mensaje, setMensaje] = useState("");
 
     useEffect(() => {
         const fetchPedido = async () => {
@@ -18,62 +22,76 @@ const PedidoDetalle = ({ pedidoId, tableSchema }) => {
     }, [pedidoId]);
 
     useEffect(() => {
-        console.log("ITEM EN USEE: ", item)
         if (item) {
             setPedido(item.pedido);
             setDetalles(item.detalles);
-            setEstado(item.Estado);
+            setEstado(item.pedido?.Estado || "pendiente");
         }
     }, [item]);
 
     const handleActualizarEstado = async () => {
-        await fetch(`/api/pedido/${pedidoId}/estado`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ estado }),
-        });
-        alert("Estado actualizado");
+        try {
+            console.log("Actualizando estado: ", pedidoId, estado)
+            await updateItem(pedidoId, {Estado : estado});
+            alert("Estado actualizado");
+        } catch (err) {
+            console.error("Error al actualizar estado:", err);
+            alert("Error actualizando el estado");
+        }
+        handleShowDetalle(null);
+    };
+
+
+    const handleCloseDetalle = () => {
+        handleShowDetalle(null);
     };
 
     if (!pedido) return <div className={styles.loading}>Cargando pedido...</div>;
 
     return (
-        <div className={styles.detalleCont}>
-            <div className={styles.titleBtnCont}>
-                <h2 className={styles.title}>Pedido #{pedido.Id}</h2>
-                <button onClick={handleActualizarEstado} className={styles.btn}>
-                    Guardar cambios
-                </button>
-            </div>
+        <div className={styles.modalOverlay}>
+            <button className={`${buttonStyles.deleteButton} ${styles.btnCloseModal}`} onClick={handleCloseDetalle}>
+                <i className="fa-solid fa-xmark"></i>
+            </button>
+            <div className={styles.detalleCont}>
+                <div className={styles.titleBtnCont}>
+                    <h2 className={styles.title}>Pedido #{pedido.Id}</h2>
+                    <button onClick={handleActualizarEstado} className={styles.btn} disabled={loading}>
+                        {loading ? "Guardando..." : "Guardar cambios"}
+                    </button>
+                </div>
 
-            <div className={styles.infoBox}>
-                <p><strong>Usuario:</strong> {pedido.NombreUsuario}</p>
-                <p><strong>Fecha:</strong> {new Date(pedido.FechaPedido).toLocaleString()}</p>
+                {mensaje && <p className={styles.feedbackMsg}>{mensaje}</p>}
 
-                <label className={styles.label}>
-                    Estado:
-                    <select
-                        className={styles.select}
-                        value={estado}
-                        onChange={(e) => setEstado(e.target.value)}
-                    >
-                        <option value="pendiente">pendiente</option>
-                        <option value="preparado">preparado</option>
-                        <option value="entregado">entregado</option>
-                        <option value="pago">pago</option>
-                    </select>
-                </label>
-            </div>
+                <div className={styles.infoBox}>
+                    <p><strong>Usuario:</strong> {pedido.NombreUsuario}</p>
+                    <p><strong>Fecha:</strong> {new Date(pedido.FechaPedido).toLocaleString()}</p>
 
-            <div className={styles.productosCont}>
-                <h3>Productos</h3>
-                <ul className={styles.listaProductos}>
-                    {detalles?.map((item) => (
-                        <li key={item.Id} className={styles.productoItem}>
-                            {item.NombreProducto} x {item.Cantidad}
-                        </li>
-                    ))}
-                </ul>
+                    <label className={styles.label}>
+                        Estado:
+                        <select
+                            className={styles.select}
+                            value={estado}
+                            onChange={(e) => setEstado(e.target.value)}
+                        >
+                            <option value="pendiente">pendiente</option>
+                            <option value="preparado">preparado</option>
+                            <option value="entregado">entregado</option>
+                            <option value="cancelado">cancelado</option>
+                        </select>
+                    </label>
+                </div>
+
+                <div className={styles.productosCont}>
+                    <h3>Productos</h3>
+                    <ul className={styles.listaProductos}>
+                        {detalles?.map((item) => (
+                            <li key={item.Id} className={styles.productoItem}>
+                                {item.NombreProducto} x {item.Cantidad}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </div>
         </div>
     );

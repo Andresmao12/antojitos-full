@@ -35,7 +35,6 @@ const Pedidos = () => {
     }
 
     const handleShowCreate = () => setShowCreate(!showCreate)
-
     const handleRefresh = () => fetchAll()
 
     return (
@@ -45,14 +44,8 @@ const Pedidos = () => {
                 <button className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleShowCreate}>Añadir</button>
             </div>
             {showCreate && <AddPedidoModal handleShowCreate={handleShowCreate} handleRefresh={handleRefresh} />}
-            {detalleId && (
-                <div className={styles.modalOverlay}>
-                    <div className={styles.modalContent}>
-                        <PedidoDetalle pedidoId={detalleId} tableSchema={tableSchema}/>
-                        <button onClick={() => setDetalleId(null)} className={buttonStyles.closeButton}>Cerrar</button>
-                    </div>
-                </div>
-            )}
+            {detalleId && <PedidoDetalle pedidoId={detalleId} tableSchema={tableSchema}  handleShowDetalle={handleVerDetalle} />}
+            
             <div className={styles.registersCont}>
                 <DataTable data={data} getId={handleVerDetalle} />
             </div>

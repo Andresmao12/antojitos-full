@@ -79,7 +79,7 @@ export const update = async (tableSchema, id, data) => {
     try {
         const { namedb } = tableSchema;
 
-        const res = await fetch(`${API_ROUTE}/${namedb}/${id}`, {
+        const res = await fetch(`${API_ROUTE}/${namedb.toLowerCase()}/${id}`, {
             method: 'PUT',
             headers: {
                 "Content-Type": "application/json",

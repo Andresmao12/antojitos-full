@@ -119,7 +119,7 @@ const Dashboard = () => {
                             console.log("INFO INSUMO: ", info)
                             return (
                                 <li key={insumo.InsumoID}>
-                                    {info ? `${info.Nombre}: ${insumo.CantidadTotal} ` : `ID ${insumo.InsumoID}: ${insumo.CantidadTotal}`}
+                                    {info ? `${info.Nombre}: ${Math.round(insumo.CantidadTotal)} ` : `ID ${insumo.InsumoID}: ${Math.round(insumo.CantidadTotal)}`}
                                 </li>
                             );
                         })}

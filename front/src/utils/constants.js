@@ -89,7 +89,7 @@ export const SHEMA_DB = {
             namedb: "Pedido",
             columns: [
                 { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
-                { name: "Usuario", namedb: "UsuarioID", type: "number", required: true },
+                { name: "Usuario", namedb: "UsuarioID", type: "number", required: true, fk : true },
                 { name: "Estado", namedb: "Estado", type: "string", readonly: true },
                 { name: "Fecha del Pedido", namedb: "FechaPedido", type: "string", required: true }
             ],

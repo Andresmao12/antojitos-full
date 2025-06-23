@@ -7,12 +7,27 @@ import { useApi } from '../../hooks/useApi'
 // RECIBIR TABLESHEMA
 const DataTable = ({ data, getId }) => {
 
-  const excludeValores = ['Rol', 'CantidadPorPresentacion', 'PrecioUnitarioCalculado']
+  const { fetchAll, dataFrom } = useApi()
+
+  const excludeValores = ['Rol', 'CantidadPorPresentacion', 'PrecioUnitarioCalculado', 'Compuesto']
 
   const handleGetId = (id) => {
     getId(id)
     console.log("ID EN DT: ", id)
   }
+
+  useEffect(() => {
+    if (!Array.isArray(data) || data.length === 0) return;
+
+    const keys = Object.keys(data[0]);
+    const relaciones = keys
+      .filter(key => key.toLowerCase().includes("id", 3))
+      .map(key => key.replace("ID", ""));
+
+      console.log("USUARIOO: ", data)
+    relaciones.forEach(table => fetchAll(table));
+  }, [data]);
+
   console.log("DATA MS", data)
   if (!data || data?.length == 0) return <span className={styles.msgWithoutData}>Por aca no hay informacion</span>
 
@@ -24,13 +39,15 @@ const DataTable = ({ data, getId }) => {
           {/* TOMAMOS LAS KEYS DEL PRIMER OBJ PARA LOS ENCABEZADOS */}
           {Array.isArray(data) && data.length > 0 && (
 
-            Object.keys(data[0]).map((key, index) => (
+            Object.keys(data[0]).map((key, index) => {
 
-              excludeValores.includes(key) ?
-                null
+              if (excludeValores.includes(key)) return null
+
+              return key.toLowerCase().includes("id", 3) ?
+                <th key={index} className={styles.head_data}>{key.replace("ID", "")}</th>
                 :
                 <th key={index} className={styles.head_data}>{key}</th>
-            ))
+            })
           )}
           <th className={styles.head_data}>Acciones</th>
         </tr>
@@ -58,6 +75,18 @@ const DataTable = ({ data, getId }) => {
                     </td>
                   );
                 }
+
+                if (key.toLowerCase().includes("id", 3)) {
+                  console.log("DATAFROM PARA USUARIO: ",)
+                  const userName = dataFrom["Usuario"]?.find(user => user.Id === value)?.Nombre || "Sin informacion";
+                  return (
+                    <td key={index} className={styles.register_data}>
+                      {userName}
+                    </td>
+                  )
+
+                }
+
 
                 return (
                   <td key={index} className={styles.register_data}>

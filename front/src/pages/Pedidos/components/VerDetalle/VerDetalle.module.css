@@ -43,7 +43,10 @@
 }
 
 .label {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 1em;
+
     margin-top: 1rem;
     font-weight: bold;
 }
@@ -79,4 +82,27 @@
     text-align: center;
     font-size: 1.2rem;
     margin-top: 2rem;
+}
+
+.modalOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+
+.btnCloseModal {
+    position: absolute;
+    height: min-content;
+    right: 2.2em;
+    top: 1.6em;
+
+    font-size: 1.5em;
 }

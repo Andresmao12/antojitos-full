@@ -166,3 +166,64 @@ export const createPedido = async (req, res) => {
         res.status(500).json({ success: false, error: error.message });
     }
 };
+
+
+export const updateEstadoPedido = async (req, res) => {
+    const { id } = req.params;
+    const { Estado } = req.body;
+
+    try {
+        const pool = await sql.connect(config);
+
+        // 1. Actualizar estado del pedido
+        await pool.request()
+            .input("Id", sql.Int, id)
+            .input("Estado", sql.NVarChar, Estado)
+            .query(`
+        UPDATE Pedido
+        SET Estado = @Estado
+        WHERE Id = @Id
+      `);
+
+        console.log(`✅ Estado del pedido ${id} actualizado a ${Estado}`);
+        if (Estado === "cancelado") {
+            console.log("ENTRAMOS A CREAR FACTURA")
+
+            const existing = await pool.request()
+                .input("PedidoID", sql.Int, id)
+                .query("SELECT * FROM Factura WHERE PedidoID = @PedidoID");
+
+            if (existing.recordset.length === 0) {
+                // Calcular total
+                const totalResult = await pool.request()
+                    .input('PedidoID', sql.Int, id)
+                    .query(`
+    SELECT SUM(pd.Cantidad * pr.PrecioVenta) AS Total
+    FROM Pedido_Detalle pd
+    JOIN Producto pr ON pr.Id = pd.ProductoID
+    WHERE pd.PedidoID = @PedidoID
+  `);
+
+                const total = totalResult.recordset[0]?.Total || 0;
+
+                // Insertar la factura
+                await pool.request()
+                    .input("PedidoID", sql.Int, id)
+                    .input("Total", sql.Decimal(10, 2), total)
+                    .input("MetodoPago", sql.NVarChar, "efectivo") // Puedes cambiar esto si se especifica desde el frontend
+                    .input("Estado", sql.NVarChar, "pagado") // O 'pendiente' si prefieres validarlo luego
+                    .query(`
+            INSERT INTO Factura (PedidoID, Total, MetodoPago, Estado)
+            VALUES (@PedidoID, @Total, @MetodoPago, @Estado)
+          `);
+
+                console.log(`✅ Factura creada para pedido ${id}`);
+            }
+        }
+
+        res.status(200).json({ success: true, message: "Estado actualizado correctamente" });
+    } catch (error) {
+        console.error("💥 Error al actualizar estado:", error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+};

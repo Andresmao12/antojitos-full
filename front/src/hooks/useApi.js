@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { getAll, getAllFrom, getById, create, update, remove } from "../services/api"; 
 
-export const useApi = (tableSchema) => {
+export const useApi = (tableSchema = false) => {
     const [data, setData] = useState(null);
     const [dataFrom, setDataFrom] = useState({});
     const [item, setItem] = useState(null);
