@@ -47,17 +47,33 @@ CREATE TABLE Insumo (
 
 );
 
+CREATE TABLE Tamanio(
+    Id INT PRIMARY KEY IDENTITY,
+    Nombre NVARCHAR(30),
+)
+
+
+
+CREATE TABLE Plantilla(
+    Id INT PRIMARY KEY IDENTITY,
+    CantidadUsada DECIMAL(12,2) NOT NULL,
+    TamanioID INT FOREIGN KEY  REFERENCES Tamanio(Id),
+    InsumoID INT FOREIGN KEY REFERENCES Insumo(Id),
+
+)
 
 CREATE TABLE Producto (
     Id INT PRIMARY KEY IDENTITY,
     Nombre NVARCHAR(100) NOT NULL,
     Descripcion NVARCHAR(255),
     UrlImagen NVARCHAR(255),
-    Tamanio NVARCHAR(10),
+    TamanioID INT,
     DatosProceso NVARCHAR(4000),
     PrecioVenta DECIMAL(10, 2) NOT NULL,
     FechaCreacion DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (TamanioID) REFERENCES Tamanio(Id)
 );
+
 
 
 CREATE TABLE Producto_Insumo (

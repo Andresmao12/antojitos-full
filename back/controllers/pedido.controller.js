@@ -2,8 +2,12 @@ import { sql, config } from "../database/db.js";
 
 export const getAll = async (req, res) => {
     try {
+
+        const query = `SELECT * FROM Pedido`
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
+
         const pool = await sql.connect(config);
-        const result = await pool.request().query('SELECT * FROM Pedido');
+        const result = await pool.request().query(query);
         console.log(result.recordset)
         res.json(result.recordset);
 
@@ -17,24 +21,28 @@ export const getAll = async (req, res) => {
 export const getPedidoById = async (req, res) => {
     const { id } = req.params;
     try {
+
+        const query = `SELECT p.*, u.Nombre AS NombreUsuario
+        FROM Pedido p
+        JOIN Usuario u ON u.Id = p.UsuarioID
+        WHERE p.Id = @Id`
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
+
         const pool = await sql.connect(config);
         const pedido = await pool.request()
             .input('Id', sql.Int, id)
-            .query(`
-        SELECT p.*, u.Nombre AS NombreUsuario
-        FROM Pedido p
-        JOIN Usuario u ON u.Id = p.UsuarioID
-        WHERE p.Id = @Id
-      `);
+            .query(query);
+
+
+        const query2 = `SELECT pd.*, pr.Nombre AS NombreProducto
+        FROM Pedido_Detalle pd
+        JOIN Producto pr ON pr.Id = pd.ProductoID
+        WHERE pd.PedidoID = @PedidoID`
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
 
         const detalles = await pool.request()
             .input('PedidoID', sql.Int, id)
-            .query(`
-        SELECT pd.*, pr.Nombre AS NombreProducto
-        FROM Pedido_Detalle pd
-        JOIN Producto pr ON pr.Id = pd.ProductoID
-        WHERE pd.PedidoID = @PedidoID
-      `);
+            .query(query2);
 
         res.json([{ pedido: pedido.recordset[0], detalles: detalles.recordset }]);
     } catch (err) {
@@ -50,23 +58,28 @@ export const createPedido = async (req, res) => {
     const transaction = new sql.Transaction(pool);
 
     try {
+
         await transaction.begin();
 
         // 1. Insertar pedido
+        const query = ` INSERT INTO Pedido (UsuarioID, Estado)
+                OUTPUT INSERTED.Id
+                VALUES (@UsuarioID, 'pendiente')`
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
+
         const pedidoRequest = new sql.Request(transaction);
         const pedidoResult = await pedidoRequest
             .input('UsuarioID', sql.Int, UsuarioID)
-            .query(`
-                INSERT INTO Pedido (UsuarioID, Estado)
-                OUTPUT INSERTED.Id
-                VALUES (@UsuarioID, 'pendiente')
-            `);
+            .query(query);
 
         const pedidoId = pedidoResult.recordset[0].Id;
-        console.log('Pedido creado con ID:', pedidoId);
 
         // Obtener insumos compuestos y su composición
-        const insumosCompuestosRes = await transaction.request().query(`SELECT Id FROM Insumo WHERE Compuesto = 1`);
+
+        const query2 = `SELECT Id FROM Insumo WHERE Compuesto = 1`
+        console.log(`----> EJECUTANDO QUERY... "${query2}"`)
+
+        const insumosCompuestosRes = await transaction.request().query(query2);
         const idsCompuestos = insumosCompuestosRes.recordset.map(row => row.Id);
 
         const composicionesRes = await transaction.request().query(`SELECT * FROM Insumo_Composicion`);
@@ -82,14 +95,15 @@ export const createPedido = async (req, res) => {
             }
 
             // 2.1 Insertar detalle del pedido
+            const query3 = `INSERT INTO Pedido_Detalle (PedidoID, ProductoID, Cantidad)
+                    VALUES (@PedidoID, @ProductoID, @Cantidad)`
+            console.log(`----> EJECUTANDO QUERY... "${query3}"`)
+
             await transaction.request()
                 .input('PedidoID', sql.Int, pedidoId)
                 .input('ProductoID', sql.Int, productoId)
                 .input('Cantidad', sql.Decimal(12, 2), cantidad)
-                .query(`
-                    INSERT INTO Pedido_Detalle (PedidoID, ProductoID, Cantidad)
-                    VALUES (@PedidoID, @ProductoID, @Cantidad)
-                `);
+                .query(query3);
 
             // 2.2 Consultar insumos para este producto
             const insumosResult = await transaction.request()

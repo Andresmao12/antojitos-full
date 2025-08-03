@@ -2,8 +2,11 @@ import { sql, config } from "../database/db.js";
 
 export const getAll = async (req, res) => {
     try {
+        const query = 'SELECT * FROM Producto'
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
+
         const pool = await sql.connect(config);
-        const result = await pool.request().query('SELECT * FROM Producto');
+        const result = await pool.request().query(query);
         console.log(result.recordset)
         res.json(result.recordset);
 
@@ -20,12 +23,13 @@ export const getPostreById = async (req, res) => {
         if ((!req.params.id)) return res.status(400).json({ error: 'ID no proporcionado' });
         const id = req.params.id;
 
+        const query = 'SELECT * FROM Producto AS p WHERE p.Id = @id'
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
+
         const pool = await sql.connect(config);
-        const result = await pool.request().input('id', id).query('SELECT * FROM Producto AS p WHERE p.Id = @id');
-        console.log(result.recordset)
+        const result = await pool.request().input('id', id).query(query);
+        console.log("RECORSET? -----> ", result.recordset)
         res.json(result.recordset);
-
-
 
     } catch (error) {
         console.error('-- Error al obtener productos:', error);
@@ -36,11 +40,14 @@ export const getPostreById = async (req, res) => {
 export const createPostre = async (req, res) => {
     const { Nombre, UrlImagen, Descripcion, Tamanio, DatosProceso, PrecioVenta, insumos } = req.body;
 
-    console.log("DATOS DEL PRODUCTO: ----->", JSON.stringify(req.body))
-
-    console.log("DATOS PROCESOOOOO: ----->", JSON.stringify(DatosProceso))
-
     try {
+
+
+        const query = `INSERT INTO Producto (Nombre, UrlImagen, Descripcion, PrecioVenta, DatosProceso, Tamanio)
+                VALUES (@Nombre, @UrlImagen, @Descripcion, @PrecioVenta, @DatosProceso, @Tamanio);
+                SELECT SCOPE_IDENTITY() AS NewId`
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
+
         const pool = await sql.connect(config);
 
         const resultprod = await pool.request()
@@ -57,21 +64,19 @@ export const createPostre = async (req, res) => {
             `);
 
         const idGenerado = resultprod.recordset[0].NewId
-        console.log("-----> RESULTADO DEL ID GENERADO: ", idGenerado);
 
-        console.log("PRODUCTO -> INSUMO DIRECTO: ", insumos)
+
+        const query2 = ` INSERT INTO Producto_Insumo (InsumoID, ProductoID, CantidadUsada)
+                VALUES (@insumoId, @productoId, @cantidad)`
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
 
         for (const [i, register] of insumos.entries()) {
 
-            console.log("PRODUCTO -> INSUMO: ", register)
             const result = await pool.request()
                 .input('insumoId', sql.VarChar, register['insumoId'],)
                 .input('productoId', sql.VarChar, idGenerado.toString())
                 .input('cantidad', sql.VarChar, register['cantidad'])
-                .query(`
-                INSERT INTO Producto_Insumo (InsumoID, ProductoID, CantidadUsada)
-                VALUES (@insumoId, @productoId, @cantidad)
-            `);
+                .query(query2);
 
             console.log(`[${i}] insumos ---->  ${result}`)
 

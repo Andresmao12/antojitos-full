@@ -7,13 +7,10 @@ export const getAll = async (req, res) => {
         console.log(result.recordset)
         res.json(result.recordset);
 
-        
-
     } catch (error) {
         console.error('-- Error al obtener usuarios:', error);
         res.status(500).json({ error: 'Error al obtener los usuaarios' });
     }
-
 };
 
 export const getUserById = (req, res) => {
@@ -25,19 +22,20 @@ export const createUser = async (req, res) => {
     const { Nombre, Correo, Rol, Celular, Direccion } = req.body;
 
     try {
+
+        const query = `INSERT INTO Usuario (Nombre, Correo, Rol, Celular, Direccion)
+                VALUES (@Nombre, @Correo, @Rol, @Celular, @Direccion)`
+        console.log(`----> EJECUTANDO QUERY... "${query}"`)
+
         const pool = await sql.connect(config);
 
         const result = await pool.request()
             .input('Nombre', sql.VarChar, Nombre)
             .input('Correo', sql.VarChar, Correo)
-            // .input('Rol', sql.VarChar, Rol) Revisar mas adelante
-            .input('Rol', sql.VarChar, "1")
+            .input('Rol', sql.VarChar, "1") // -----> REVISAR
             .input('Celular', sql.VarChar, Celular)
             .input('Direccion', sql.VarChar, Direccion)
-            .query(`
-                INSERT INTO Usuario (Nombre, Correo, Rol, Celular, Direccion)
-                VALUES (@Nombre, @Correo, @Rol, @Celular, @Direccion)
-            `);
+            .query(query);
 
         console.log(result);
         res.status(201).json({ message: 'Usuario creado exitosamente' });
