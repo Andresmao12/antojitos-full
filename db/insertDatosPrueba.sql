@@ -1,49 +1,91 @@
+-- =========================================
+-- DATOS DE PRUEBA
+-- =========================================
 
+-- Roles
 INSERT INTO Rol (Nombre) VALUES
-('Administrador'),
-('Cliente');
+('ADMINISTRADOR'),
+('OPERADOR'),
+('CLIENTE'),
+('SUPERVISOR'),
+('CAJERO');
 
+-- Usuarios
+INSERT INTO Usuario (Nombre, Correo, Celular, Direccion, RolID) VALUES
+('Juan Pérez', 'juan@example.com', '3001111111', 'Calle 123', 1),
+('Ana Gómez', 'ana@example.com', '3002222222', 'Carrera 45', 2),
+('Carlos Ruiz', 'carlos@example.com', '3003333333', 'Avenida 10', 3),
+('Laura Torres', 'laura@example.com', '3004444444', 'Calle 77', 3),
+('Pedro Sánchez', 'pedro@example.com', '3005555555', 'Carrera 8', 4);
 
-INSERT INTO Usuario (Nombre, Correo, Rol, Celular, Direccion) VALUES
-('Camila Torres', 'camila@correo.com', 1, '3001234567', 'Calle 10 #45-32'),
-('Juan Pérez', 'juan@correo.com', 2, '3012345678', 'Cra 50 #30-21'),
-('María López', 'maria@correo.com', 2, '3023456789', 'Calle 60 #15-40'),
-('Santiago Gómez', 'santi@correo.com', 1, '3034567890', 'Cra 80 #20-10'),
-('Laura Ramírez', 'laura@correo.com', 1, '3045678901', 'Calle 70 #25-50'),
-('Carlos Díaz', 'carlos@correo.com', 2, '3056789012', 'Cra 45 #12-11'),
-('Daniela Vega', 'daniela@correo.com', 1, '3067890123', 'Calle 90 #70-23'),
-('Andrés Castaño', 'andres@correo.com', 2, '3078901234', 'Cra 30 #80-50'),
-('Tatiana Ruiz', 'tatiana@correo.com', 1, '3089012345', 'Calle 33 #11-10'),
-('Esteban Mejía', 'esteban@correo.com', 2, '3090123456', 'Cra 10 #5-23');
+-- Tamaños
+INSERT INTO Tamanio (Nombre) VALUES
+('10oz'),
+('12oz'),
+('16oz'),
+('20oz'),
+('Pequeño');
 
+-- Insumos
+INSERT INTO Insumo (Nombre, Proveedor, Cantidad_Unidad, Precio_Unidad, CantidadDisponible) VALUES
+('Harina de Trigo', 'Molinos SA', 1000, 2.50, 5000),
+('Azúcar', 'Dulces Ltda', 1000, 3.00, 4000),
+('Leche Entera', 'Colanta', 1000, 4.20, 3000),
+('Huevos', 'Granja Feliz', 30, 7.50, 500),
+('Mantequilla', 'Alpina', 500, 6.80, 2000);
 
-INSERT INTO Producto (Nombre, Descripcion, UrlImagen, PrecioVenta) VALUES
-('Brownie', 'Brownie de chocolate con nueces', 'https://i.pinimg.com/originals/73/26/b0/7326b034b560a6607da3aa6bb8a3c622.jpg', 5000),
-('Tiramisú', 'Postre italiano con café y mascarpone', 'https://i.pinimg.com/originals/73/26/b0/7326b034b560a6607da3aa6bb8a3c622.jpg', 7000),
-('Cheesecake', 'Tarta de queso con mermelada de fresa', 'https://i.pinimg.com/originals/73/26/b0/7326b034b560a6607da3aa6bb8a3c622.jpg', 6000),
-('Tres Leches', 'Bizcocho bañado en tres tipos de leche', 'https://i.pinimg.com/originals/73/26/b0/7326b034b560a6607da3aa6bb8a3c622.jpg', 5500),
-('Flan', 'Flan de caramelo tradicional', 'https://postrecasero.com/wp-content/uploads/2023/01/Esponjado-de-mora.webp', 4000),
-('Cupcake', 'Cupcake de vainilla con crema', 'https://postrecasero.com/wp-content/uploads/2023/01/Esponjado-de-mora.webp', 4500),
-('Mousse de Maracuyá', 'Postre suave y frutal', 'https://postrecasero.com/wp-content/uploads/2023/01/Esponjado-de-mora.webp', 5200),
-('Milhoja', 'Milhoja con crema pastelera', 'https://postrecasero.com/wp-content/uploads/2023/01/Esponjado-de-mora.webp', 4800),
-('Churros', 'Churros con arequipe', 'https://postrecasero.com/wp-content/uploads/2023/01/Esponjado-de-mora.webp', 4300),
-('Galleta Rellena', 'Galleta de avena con relleno de chocolate', 'https://postrecasero.com/wp-content/uploads/2023/01/Esponjado-de-mora.webp', 3900);
+-- Plantillas
+INSERT INTO Plantilla (TamanioID, Nombre, Descripcion) VALUES
+(1, 'Torta Vainilla', 'Torta clásica de vainilla'),
+(2, 'Torta Chocolate', 'Bizcocho de chocolate húmedo'),
+(3, 'Cupcake Fresa', 'Cupcake con crema de fresa'),
+(4, 'Cheesecake', 'Pastel de queso tradicional'),
+(5, 'Brownie', 'Brownie de chocolate con nuez');
 
+-- Productos
+INSERT INTO Producto (Nombre, Descripcion, TamanioID, PrecioVenta, PlantillaID) VALUES
+('Mini Torta Vainilla', 'Versión pequeña de torta vainilla', 1, 12.50, 1),
+('Torta Chocolate Familiar', 'Torta grande para compartir', 2, 35.00, 2),
+('Cupcake Fresa Decorado', 'Cupcake con topping de fresa', 3, 8.00, 3),
+('Cheesecake New York', 'Estilo clásico NY', 4, 28.50, 4),
+('Brownie con Nuez', 'Brownie artesanal', 5, 5.50, 5);
 
-INSERT INTO Pedido (UsuarioID, FechaPedido) VALUES
-(1, '2025-05-01'),
-(2, '2025-05-02'),
-(3, '2025-05-03'),
-(4, '2025-05-04'),
-(5, '2025-05-05'),
-(6, '2025-05-06')
+-- Producto_Insumo
+INSERT INTO Producto_Insumo (ProductoID, InsumoID, Cantidad, PrecioUnitario) VALUES
+(1, 1, 200, 2.50),
+(1, 2, 100, 3.00),
+(2, 3, 500, 4.20),
+(3, 4, 5, 7.50),
+(5, 5, 100, 6.80);
 
+-- Pedidos
+INSERT INTO Pedido (UsuarioID, Estado) VALUES
+(1, 'PENDIENTE'),
+(2, 'EN_PROCESO'),
+(3, 'COMPLETADO'),
+(4, 'CANCELADO'),
+(5, 'PENDIENTE');
 
-SELECT * FROM Usuario
-SELECT * FROM Pedido
-SELECT * FROM Producto
+-- Pedido_Detalle
+INSERT INTO Pedido_Detalle (PedidoID, ProductoID, Cantidad) VALUES
+(1, 1, 2),
+(1, 3, 1),
+(2, 2, 1),
+(3, 4, 2),
+(5, 5, 3);
 
+-- Facturas
+INSERT INTO Factura (PedidoID, Total, MetodoPago, Estado) VALUES
+(1, 33.00, 'EFECTIVO', 'PENDIENTE'),
+(2, 35.00, 'TARJETA', 'PAGO'),
+(3, 57.00, 'EFECTIVO', 'PAGO'),
+(4, 20.00, 'TRANSFERENCIA', 'ANULADO'),
+(5, 16.50, 'TARJETA', 'PENDIENTE');
 
-DELETE FROM Producto;
-
-DBCC CHECKIDENT ('Pedido', RESEED, 0);
+-- Log_Insumo
+INSERT INTO Log_Insumo (InsumoID, UsuarioID, TipoMovimiento, Cantidad, Motivo) VALUES
+(1, 1, 'ENTRADA', 1000, 'Compra mayorista'),
+(2, 2, 'SALIDA', 200, 'Uso en producción'),
+(3, 3, 'ENTRADA', 500, 'Reposición bodega'),
+(4, 4, 'SALIDA', 50, 'Pedido especial'),
+(5, 5, 'AJUSTE', 20, 'Inventario físico');

@@ -1,15 +1,13 @@
-import sql from 'mssql'
+import pkg from 'pg';
+const { Pool } = pkg;
 
-const config = {
-    user: 'MAUROAS_auth',
-    password: 'andresmao1234567',
-    server: 'localhost',
-    database: 'bd_antojitos',
-    port: 1433,
-    options: {
-        encrypt: false,
-        trustServerCertificate: true
-    }
-};
+const pool = new Pool({
+    user: 'mauro',
+    password: 'mauro',
+    host: 'localhost',
+    port: 3000,
+    database: 'antojitos_db'
+});
 
-export {sql, config}
+
+export { pool }

@@ -1,38 +1,26 @@
--- Desactiva restricciones de clave foránea
-EXEC sp_msforeachtable "ALTER TABLE ? NOCHECK CONSTRAINT ALL";
+-- =========================================
+-- ELIMINAR TODAS LAS TABLAS (CON CASCADE)
+-- =========================================
 
--- Elimina datos en orden correcto (si hay dependencias entre tablas)
-DELETE FROM Pedido_Detalle;
-DELETE FROM Factura;
-DELETE FROM Pedido;
-DELETE FROM Producto_Insumo;
-DELETE FROM Log_Insumo;
-DELETE FROM Producto;
-DELETE FROM Insumo;
-DELETE FROM Usuario;
-DELETE FROM Rol;
+DROP TABLE IF EXISTS Log_Insumo CASCADE;
+DROP TABLE IF EXISTS Factura CASCADE;
+DROP TABLE IF EXISTS Pedido_Detalle CASCADE;
+DROP TABLE IF EXISTS Pedido CASCADE;
+DROP TABLE IF EXISTS Producto_Insumo CASCADE;
+DROP TABLE IF EXISTS Producto CASCADE;
+DROP TABLE IF EXISTS Plantilla CASCADE;
+DROP TABLE IF EXISTS Insumo CASCADE;
+DROP TABLE IF EXISTS Tamanio CASCADE;
+DROP TABLE IF EXISTS Usuario CASCADE;
+DROP TABLE IF EXISTS Rol CASCADE;
 
--- Reinicia el contador IDENTITY
-DBCC CHECKIDENT ('Pedido_Detalle', RESEED, 0);
-DBCC CHECKIDENT ('Factura', RESEED, 0);
-DBCC CHECKIDENT ('Pedido', RESEED, 0);
-DBCC CHECKIDENT ('Log_Insumo', RESEED, 0);
-DBCC CHECKIDENT ('Producto_Insumo', RESEED, 0);
-DBCC CHECKIDENT ('Producto', RESEED, 0);
-DBCC CHECKIDENT ('Insumo', RESEED, 0);
-DBCC CHECKIDENT ('Usuario', RESEED, 0);
-DBCC CHECKIDENT ('Rol', RESEED, 0);
+-- =========================================
+-- ELIMINAR TIPOS ENUM PERSONALIZADOS
+-- =========================================
 
--- Vuelve a activar restricciones
-EXEC sp_msforeachtable "ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL";
-
-
-
-INSERT INTO Rol (Nombre)
-VALUES 
-('Administrador'),
-('Empleado'),
-('Cliente'),
-('Repartidor'),
-('Supervisor');
-
+DROP TYPE IF EXISTS tipo_capa_enum CASCADE;
+DROP TYPE IF EXISTS estado_postre_enum CASCADE;
+DROP TYPE IF EXISTS estado_factura_enum CASCADE;
+DROP TYPE IF EXISTS estado_pedido_enum CASCADE;
+DROP TYPE IF EXISTS metodo_pago_enum CASCADE;
+DROP TYPE IF EXISTS tipo_movimiento_enum CASCADE;

@@ -1,54 +1,44 @@
-import { sql, config } from "../database/db.js";
+import * as userService from '../services/user.service.js';
 
-export const getAll = async (req, res) => {
+export const getAllUsers = async (req, res) => {
+
     try {
-        const pool = await sql.connect(config);
-        const result = await pool.request().query('SELECT * FROM Usuario');
-        console.log(result.recordset)
-        res.json(result.recordset);
-
+        const result = await userService.getAllUsers();
+        res.json(result);
     } catch (error) {
-        console.error('-- Error al obtener usuarios:', error);
-        res.status(500).json({ error: 'Error al obtener los usuaarios' });
+        console.error('-- Error al obtener todos los usuarios:', error);
+        res.status(500).json({ error: 'Error al obtener los usuarios' });
     }
 };
 
-export const getUserById = (req, res) => {
-    const { id } = req.params;
-    res.json({ name: `User ${id}` });
+
+export const getUserById = async (req, res) => {
+    try {
+        const result = await userService.getUserById();
+        res.json(result);
+    } catch (error) {
+        console.error('-- Error al obtener un usuario:', error);
+        res.status(500).json({ error: 'Error al obtener un usuario' });
+    }
 };
 
 export const createUser = async (req, res) => {
-    const { Nombre, Correo, Rol, Celular, Direccion } = req.body;
-
     try {
-
-        const query = `INSERT INTO Usuario (Nombre, Correo, Rol, Celular, Direccion)
-                VALUES (@Nombre, @Correo, @Rol, @Celular, @Direccion)`
-        console.log(`----> EJECUTANDO QUERY... "${query}"`)
-
-        const pool = await sql.connect(config);
-
-        const result = await pool.request()
-            .input('Nombre', sql.VarChar, Nombre)
-            .input('Correo', sql.VarChar, Correo)
-            .input('Rol', sql.VarChar, "1") // -----> REVISAR
-            .input('Celular', sql.VarChar, Celular)
-            .input('Direccion', sql.VarChar, Direccion)
-            .query(query);
-
-        console.log(result);
-        res.status(201).json({ message: 'Usuario creado exitosamente' });
-
-        ;
+        const result = await userService.createUser(req.body);
+        res.json(result);
     } catch (error) {
-        console.error('-- Error al crear usuario:', error);
-        res.status(500).json({ error: 'Error al crear el usuario' });
+        console.error('-- Error crear un usuario:', error);
+        res.status(500).json({ error: 'Error al crear un usuario' });
     }
 };
 
-export const updateUser = (req, res) => {
-    const nuevoUser = req.body;
-    res.status(201).json({ message: "User creado", data: nuevoUser });
+export const updateUser = async (req, res) => {
+    try {
+        const result = await userService.updateUser();
+        res.json(result);
+    } catch (error) {
+        console.error('-- Error al actualizar un usuario:', error);
+        res.status(500).json({ error: 'Error al actualizar un usuario' });
+    }
 };
 

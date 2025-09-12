@@ -2,7 +2,7 @@ import express from 'express'
 import cors from 'cors'
 
 const app = express()
-const PORT = 3000
+const PORT = 4000
 
 app.use(express.json())
 app.use(cors({
@@ -10,20 +10,24 @@ app.use(cors({
 }))
 
 
-// RUTAS
-import ProductRouter from './routes/product.routes.js'
-import UserRouter from './routes/user.routes.js'
-import pedidoRouter from './routes/pedido.routes.js'
-import InsumoRouter from './routes/insumo.routes.js'
-import Prod_insumRouter from './routes/prod_insum.routes.js'
-import DashboardRouter from './routes/dashboard.routes.js'
+// SWAGGER
+import { swaggerUi, specs } from './swagger.js'
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs))
 
-app.use('/api/dashboard', DashboardRouter);
-app.use('/api/producto', ProductRouter);
-app.use('/api/usuario', UserRouter);
+// RUTAS
+import userRouter from './routes/user.routes.js'
+import insumoRouter from './routes/insumo.routes.js'
+import productRouter from './routes/product.routes.js'
+import productoInsumoRouter from './routes/product_Insumo.routes.js'
+import pedidoRouter from './routes/pedido.routes.js'
+import dashboardRouter from './routes/dashboard.routes.js'
+
+app.use('/api/usuario', userRouter);
+app.use('/api/insumo', insumoRouter);
+app.use('/api/producto', productRouter);
+app.use('/api/producto_insumo', productoInsumoRouter);
 app.use('/api/pedido', pedidoRouter);
-app.use('/api/insumo', InsumoRouter);
-app.use('/api/producto_insumo', Prod_insumRouter);
+app.use('/api/dashboard', dashboardRouter);
 
 
 app.listen(PORT, () => {

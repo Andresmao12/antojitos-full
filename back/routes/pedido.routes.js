@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { getAll, getPedidoById, createPedido, updateEstadoPedido } from '../controllers/pedido.controller.js';
+import { getAllOrders, getOrderById, createOrder, updateOrderState } from '../controllers/order.controller.js';
 
-const PedidoRouter = Router();
+const pedidoRouter = Router();
 
-PedidoRouter.get('/', getAll);
-PedidoRouter.get('/:id', getPedidoById);
-PedidoRouter.post('/', createPedido);
-PedidoRouter.put('/:id', updateEstadoPedido);
+pedidoRouter.get('/', getAllOrders);
+pedidoRouter.get('/:id', getOrderById);
+pedidoRouter.post('/', createOrder);
+pedidoRouter.put('/:id', updateOrderState);
 
-export default PedidoRouter;
+export default pedidoRouter;

@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import { getDashboardData } from '../controllers/dashboard.controller.js';
 
-const DashboardRouter = Router();
+const dashboardRouter = Router();
 
-DashboardRouter.get('/', getDashboardData);
+dashboardRouter.get('/', getDashboardData);
 // DashboardRouter.get('/:id', getPedidoById);
 // DashboardRouter.post('/', createPedido);
 // router.put('/', updatePostre);
 
-export default DashboardRouter;
+export default dashboardRouter;

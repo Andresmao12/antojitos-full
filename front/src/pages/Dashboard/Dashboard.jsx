@@ -20,7 +20,7 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchDashboard = async () => {
             try {
-                const res = await fetch("http://localhost:3000/api/dashboard");
+                const res = await fetch("http://localhost:4000/api/dashboard");
                 const result = await res.json();
                 console.log("Dashboard data:", result);
                 setData(result);
@@ -50,6 +50,8 @@ const Dashboard = () => {
     } = data;
     console.log("INSREQ", insumosRequeridos)
 
+    console.log("DATA EN DATAA: ",  data)
+
     const postresOrdenados = [...postresPendientes].sort((a, b) => {
         if (a.Nombre < b.Nombre) return -1;
         if (a.Nombre > b.Nombre) return 1;
@@ -77,7 +79,6 @@ const Dashboard = () => {
         return acc;
     }, {});
 
-    // if (!data || !dataFrom["Insumo"]) return <div>Cargando dashboard...</div>;
 
     return (
         <div className={styles.dashboard}>

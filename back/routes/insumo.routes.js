@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { getAll, createInsumo } from '../controllers/insumo.controller.js';
+import { getAllInsumos, getInsumoById, createInsumo } from '../controllers/insumo.controller.js';
 
-const InsumoRouter = Router();
+const insumoRouter = Router();
 
-InsumoRouter.get('/', getAll);
-// router.get('/:id', getPostreById);
-InsumoRouter.post('/', createInsumo);
-// router.put('/', updatePostre);
+insumoRouter.get('/', getAllInsumos);
+insumoRouter.get('/:id', getInsumoById);
+insumoRouter.post('/', createInsumo);
+// insumoRouter.put('/', updatePostre);
 
-export default InsumoRouter;
+export default insumoRouter;

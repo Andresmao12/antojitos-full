@@ -1,8 +1,8 @@
-import * as productService from '../services/product.service.js';
+import * as orderService from '../services/order.service.js';
 
-export const getAllProducts = async (req, res) => {
+export const getAllOrders = async (req, res) => {
     try {
-        const result = await productService.getAllProducts();
+        const result = await orderService.getAllOrders();
         res.json(result);
     } catch (error) {
         console.error('-- Error al obtener un product:', error);
@@ -10,9 +10,10 @@ export const getAllProducts = async (req, res) => {
     }
 };
 
-export const getProductById = async (req, res) => {
+
+export const getOrderById = async (req, res) => {
     try {
-        const result = await productService.getProductById(req.params.id);
+        const result = await orderService.getOrderById();
         res.json(result);
     } catch (error) {
         console.error('-- Error al obtener un product:', error);
@@ -20,9 +21,9 @@ export const getProductById = async (req, res) => {
     }
 };
 
-export const createProduct = async (req, res) => {
+export const createOrder = async (req, res) => {
     try {
-        const result = await productService.createProduct(req.body);
+        const result = await orderService.createOrder();
         res.json(result);
     } catch (error) {
         console.error('-- Error al obtener un product:', error);
@@ -30,9 +31,10 @@ export const createProduct = async (req, res) => {
     }
 };
 
-export const updateProduct = async (req, res) => {
+
+export const updateOrderState = async (req, res) => {
     try {
-        const result = await productService.updateProduct(req.body);
+        const result = await orderService.updateOrderState();
         res.json(result);
     } catch (error) {
         console.error('-- Error al obtener un product:', error);
