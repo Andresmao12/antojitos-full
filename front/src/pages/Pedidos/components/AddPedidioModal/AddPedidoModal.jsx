@@ -13,6 +13,7 @@ const AddPedidoModal = ({ handleShowCreate, handleRefresh }) => {
         const load = async () => {
             await fetchAll("Usuario")
             await fetchAll("Producto")
+            await fetchAll("Tamanio")
         }
         load()
     }, [])
@@ -75,8 +76,8 @@ const AddPedidoModal = ({ handleShowCreate, handleRefresh }) => {
                     >
                         <option>Seleccione cliente...</option>
                         {dataFrom["Usuario"]?.map((usuario) => (
-                            <option key={usuario.Id} value={usuario.Id}>
-                                {usuario.Nombre} ({usuario.Correo})
+                            <option key={usuario.id} value={usuario.id}>
+                                {usuario.nombre} ({usuario.correo})
                             </option>
                         ))}
                     </select>
@@ -94,9 +95,9 @@ const AddPedidoModal = ({ handleShowCreate, handleRefresh }) => {
                         >
                             <option>Seleccione producto...</option>
                             {dataFrom["Producto"]?.map((producto) => (
-                                <option key={producto.Id} value={producto.Id}>
+                                <option key={producto.id} value={producto.id}>
                                     {console.log(producto)}
-                                    {`${producto.Nombre} ➜ ${producto.Tamanio}`}
+                                    {`${producto.nombre} ${dataFrom["Tamanio"]?.find(t => t.id === producto.tamanio_id)?.nombre} ➜ $${producto.precio_venta}`}
                                 </option>
                             ))}
                         </select>
@@ -123,10 +124,11 @@ const AddPedidoModal = ({ handleShowCreate, handleRefresh }) => {
 
                 <div className={styles.ingredientesCont}>
                     {detallePedido.map((item, idx) => {
-                        const prod = dataFrom["Producto"]?.find(p => p.Id == item.ProductoID)
+                        const prod = dataFrom["Producto"]?.find(p => p.ProductoID == item.producto_id)
+
                         return (
                             <div key={idx} className={styles.ingredienteCont}>
-                                <span>{prod?.Nombre}</span>
+                                <span>{prod?.nombre}</span>
                                 <span>{item.Cantidad}</span>
                             </div>
                         )

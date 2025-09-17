@@ -50,8 +50,8 @@ export const createOrder = async (data) => {
         await client.query('BEGIN');
 
         const query = `
-      INSERT INTO pedido (usuarioid, estado)
-      VALUES ($1, 'pendiente')
+      INSERT INTO pedido (usuario_id, estado)
+      VALUES ($1, 'PENDIENTE')
       RETURNING id
     `;
         console.log(`----> EJECUTANDO QUERY... "${query}"`);
@@ -74,37 +74,39 @@ export const createOrder = async (data) => {
             }
 
             const query3 = `
-        INSERT INTO pedido_detalle (pedidoid, productoid, cantidad)
+        INSERT INTO pedido_detalle (pedido_id, producto_id, cantidad)
         VALUES ($1, $2, $3)
       `;
             console.log(`----> EJECUTANDO QUERY... "${query3}"`);
             await client.query(query3, [pedidoId, productoId, cantidad]);
 
             const insumosResult = await client.query(`
-        SELECT insumoid, cantidadusada
+        SELECT insumo_id, cantidad
         FROM producto_insumo
-        WHERE productoid = $1
+        WHERE producto_id = $1
       `, [productoId]);
+
+      console.log("INSUMOS A USAR:", insumosResult.rows);
 
             for (const insumo of insumosResult.rows) {
                 const cantidadTotal = insumo.cantidadusada * cantidad;
 
-                if (idsCompuestos.includes(insumo.insumoid)) {
-                    const ingredientes = composiciones.filter(c => c.insumocompuestoid === insumo.insumoid);
+                if (idsCompuestos.includes(insumo.insumo_id)) {
+                    const ingredientes = composiciones.filter(c => c.insumocompuestoid === insumo.insumo_id);
 
                     for (const ing of ingredientes) {
                         const cantidadFinal = cantidadTotal * ing.cantidadporgramo;
 
                         await client.query(`
               UPDATE insumo
-              SET cantidaddisponible = cantidaddisponible - $1,
-                  fechaactualizacion = NOW()
+              SET cantidad_disponible = cantidad_disponible - $1,
+                  fecha_actualizacion = NOW()
               WHERE id = $2
             `, [cantidadFinal, ing.ingredienteid]);
 
                         await client.query(`
-              INSERT INTO log_insumo (insumoid, usuarioid, tipomovimiento, cantidad, motivo)
-              VALUES ($1, $2, 'salida', $3, $4)
+              INSERT INTO log_insumo (insumo_id, usuario_id, tipo_movimiento, cantidad, motivo)
+              VALUES ($1, $2, 'SALIDA', $3, $4)
             `, [
                             ing.ingredienteid,
                             UsuarioID,
@@ -115,16 +117,16 @@ export const createOrder = async (data) => {
                 } else {
                     await client.query(`
             UPDATE insumo
-            SET cantidaddisponible = cantidaddisponible - $1,
-                fechaactualizacion = NOW()
+            SET cantidad_disponible = cantidad_disponible - $1,
+                fecha_actualizacion = NOW()
             WHERE id = $2
-          `, [cantidadTotal, insumo.insumoid]);
+          `, [cantidadTotal, insumo.insumo_id]);
 
                     await client.query(`
-            INSERT INTO log_insumo (insumoid, usuarioid, tipomovimiento, cantidad, motivo)
-            VALUES ($1, $2, 'salida', $3, $4)
+            INSERT INTO log_insumo (insumo_id, usuario_id, tipo_movimiento, cantidad, motivo)
+            VALUES ($1, $2, 'SALIDA', $3, $4)
           `, [
-                        insumo.insumoid,
+                        insumo.insumo_id,
                         UsuarioID,
                         cantidadTotal,
                         `Producción del producto ID ${productoId} (pedido ${pedidoId})`

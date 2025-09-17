@@ -46,6 +46,7 @@ export const useApi = (tableSchema = false) => {
 
 
     const createItem = useCallback(async (newData) => {
+        console.log("NEW DATA EN USE API: ", newData)
         setLoading(true);
         setError(null);
         try {

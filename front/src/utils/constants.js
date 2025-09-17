@@ -2,133 +2,171 @@ export const SHEMA_DB = {
     tables: [
         {
             name: "Usuarios",
-            namedb: "Usuario",
+            namedb: "usuario",
             columns: [
-                { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
-                { name: "Nombre", namedb: "Nombre", type: "string", required: true },
-                { name: "Correo Electrónico", namedb: "Correo", type: "string", valueDefault: "usuariosAntojitos@gmail.com" },
-                { name: "Rol", namedb: "Rol", type: "number", required: true },
-                { name: "Celular", namedb: "Celular", type: "string", required: true },
-                { name: "Dirección", namedb: "Direccion", type: "string", valueDefault: "Sin informacion" }
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Nombre", namedb: "nombre", type: "string", required: true },
+                { name: "Correo Electrónico", namedb: "correo", type: "string", required: true },
+                { name: "Celular", namedb: "celular", type: "string" },
+                { name: "Dirección", namedb: "direccion", type: "string" },
+                { name: "Estado", namedb: "estado", type: "boolean", valueDefault: true },
+                { name: "Fecha Registro", namedb: "fecha_registro", type: "date", readonly: true },
+                { name: "Rol", namedb: "rol_id", type: "number", required: true }
             ],
-            relations: [
-                { name: "Rol", fk: "Rol" }
-            ],
+            relations: [{ name: "Rol", fk: "rol_id" }],
             showInSlider: true
         },
         {
-            namedb: "Rol",
+            namedb: "rol",
             columns: [
-                { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
-                { name: "Nombre", namedb: "Nombre", type: "string", required: true }
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Nombre", namedb: "nombre", type: "string", required: true }
             ],
             showInSlider: false
         },
         {
-            name: "Postres",
-            namedb: "Producto",
+            namedb: "tamanio",
             columns: [
-                { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
-                { name: "Nombre", namedb: "Nombre", type: "string", required: true },
-                { name: "Descripción", namedb: "Descripcion", type: "string", required: true },
-                { name: "URL de Imagen", namedb: "UrlImagen", type: "string", required: true },
-                { name: "Datos del proceso", namedb: "DatosProceso", type: "string", required: true },
-                { name: "Precio de Venta", namedb: "PrecioVenta", type: "number", required: true },
-                { name: "Tamaño", namedb: "Tamanio", type: "string", required: true }
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Nombre", namedb: "nombre", type: "string", required: true }
+            ],
+            showInSlider: false
+        },
+        {
+            namedb: "plantilla",
+            columns: [
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Tamaño", namedb: "tamanio_id", type: "number", required: true },
+                { name: "Nombre", namedb: "nombre", type: "string", required: true },
+                { name: "Descripción", namedb: "descripcion", type: "string" },
+                { name: "Fecha Creación", namedb: "fecha_creacion", type: "date", readonly: true }
+            ],
+            relations: [{ name: "Tamaño", fk: "tamanio_id" }],
+            showInSlider: false
+        },
+        {
+            name: "Postres",
+            namedb: "producto",
+            columns: [
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Nombre", namedb: "nombre", type: "string", required: true },
+                { name: "Descripción", namedb: "descripcion", type: "string" },
+                { name: "URL Imagen", namedb: "url_imagen", type: "string" },
+                { name: "Tamaño", namedb: "tamanio_id", type: "number" },
+                { name: "Datos Proceso", namedb: "datos_proceso", type: "string" },
+                { name: "Precio Venta", namedb: "precio_venta", type: "number" },
+                { name: "Plantilla", namedb: "plantilla_id", type: "number" }
+            ],
+            relations: [
+                { name: "Tamaño", fk: "tamanio_id" },
+                { name: "Plantilla", fk: "plantilla_id" }
             ],
             showInSlider: true
         },
         {
             name: "Insumos",
-            namedb: "Insumo",
+            namedb: "insumo",
             columns: [
-                { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
-                { name: "Nombre", namedb: "Nombre", type: "string", required: true },
-                { name: "Proveedor", namedb: "Proveedor", type: "string", required: true },
-                { name: "Presentación", namedb: "Presentacion", type: "string", required: false },
-                { name: "Cantidad por Presentación  g/ml", namedb: "CantidadPorPresentacion", type: "number", required: false },
-                { name: "Precio Presentación", namedb: "PrecioPresentacion", type: "number", required: false },
-                { name: "Precio por g/ml", namedb: "PrecioUnitarioCalculado", type: "number", required: false, readonly: true },
-                { name: "Cantidad Disponible", namedb: "CantidadDisponible", type: "number", required: true },
-                { name: "Fecha Actualización", namedb: "FechaActualizacion", type: "date", required: false, readonly: true }
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Nombre", namedb: "nombre", type: "string", required: true },
+                { name: "Proveedor", namedb: "proveedor", type: "string" },
+                { name: "Cantidad Unidad", namedb: "cantidad_unidad", type: "number" },
+                { name: "Precio Unidad", namedb: "precio_unidad", type: "number" },
+                { name: "Compuesto", namedb: "compuesto", type: "boolean" },
+                { name: "Precio Gramo", namedb: "precio_gramo", type: "number", readonly: true },
+                { name: "Cantidad Disponible", namedb: "cantidad_disponible", type: "number" },
+                { name: "Fecha Actualización", namedb: "fecha_actualizacion", type: "date", readonly: true }
             ],
             showInSlider: true
         },
-
         {
-            namedb: "Producto_Insumo",
+            namedb: "producto_insumo",
             columns: [
-                { name: "Producto", namedb: "ProductoID", type: "number", required: true },
-                { name: "Insumo", namedb: "InsumoID", type: "number", required: true },
-                { name: "Cantidad", namedb: "Cantidad", type: "number", required: true }
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Producto", namedb: "producto_id", type: "number", required: true },
+                { name: "Insumo", namedb: "insumo_id", type: "number", required: true },
+                { name: "Cantidad", namedb: "cantidad", type: "number", required: true },
+                { name: "Precio Unitario", namedb: "precio_unitario", type: "number", required: true },
+                { name: "Fecha Registro", namedb: "fecha_registro", type: "date", readonly: true }
             ],
             relations: [
-                { name: "Producto", fk: "ProductoID" },
-                { name: "Insumo", fk: "InsumoID" }
+                { name: "Producto", fk: "producto_id" },
+                { name: "Insumo", fk: "insumo_id" }
             ],
             showInSlider: false
         },
         {
-            namedb: "Log_Insumo",
+            namedb: "insumo_composicion",
             columns: [
-                { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
-                { name: "Insumo", namedb: "InsumoID", type: "number", required: true },
-                { name: "Usuario", namedb: "UsuarioID", type: "number", required: true },
-                { name: "Fecha de Movimiento", namedb: "FechaMovimiento", type: "string", required: true },
-                { name: "Tipo de Movimiento", namedb: "TipoMovimiento", type: "string", required: true },
-                { name: "Cantidad", namedb: "Cantidad", type: "number", required: true }
+                { name: "Insumo Compuesto", namedb: "insumo_compuesto_id", type: "number", required: true },
+                { name: "Ingrediente", namedb: "ingrediente_id", type: "number", required: true },
+                { name: "Cantidad por gramo", namedb: "cantidad_por_gramo", type: "number", required: true }
             ],
             relations: [
-                { name: "Insumo", fk: "InsumoID" },
-                { name: "Usuario", fk: "UsuarioID" }
+                { name: "Insumo Compuesto", fk: "insumo_compuesto_id" },
+                { name: "Ingrediente", fk: "ingrediente_id" }
             ],
             showInSlider: false
         },
         {
             name: "Pedidos",
-            namedb: "Pedido",
+            namedb: "pedido",
             columns: [
-                { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
-                { name: "Usuario", namedb: "UsuarioID", type: "number", required: true, fk : true },
-                { name: "Estado", namedb: "Estado", type: "string", readonly: true },
-                { name: "Fecha del Pedido", namedb: "FechaPedido", type: "string", required: true }
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Usuario", namedb: "usuario_id", type: "number", required: true },
+                { name: "Estado", namedb: "estado", type: "string", readonly: true },
+                { name: "Fecha Pedido", namedb: "fecha_pedido", type: "date", readonly: true }
             ],
-            relations: [
-                { name: "Usuario", fk: "UsuarioID" }
-            ],
+            relations: [{ name: "Usuario", fk: "usuario_id" }],
             showInSlider: true
         },
         {
-            name: "Pedido_Detalle",
+            namedb: "pedido_detalle",
             columns: [
-                { name: "Pedido", namedb: "PedidoID", type: "number", required: true },
-                { name: "Producto", namedb: "ProductoID", type: "number", required: true },
-                { name: "Cantidad", namedb: "Cantidad", type: "number", required: true }
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Pedido", namedb: "pedido_id", type: "number", required: true },
+                { name: "Producto", namedb: "producto_id", type: "number", required: true },
+                { name: "Cantidad", namedb: "cantidad", type: "number", required: true }
             ],
             relations: [
-                { name: "Pedido", fk: "PedidoID" },
-                { name: "Producto", fk: "ProductoID" }
+                { name: "Pedido", fk: "pedido_id" },
+                { name: "Producto", fk: "producto_id" }
             ],
             showInSlider: false
         },
         {
-            namedb: "Factura",
+            namedb: "factura",
             columns: [
-                { name: "ID", namedb: "Id", type: "number", required: false, pk: true },
-                { name: "Pedido", namedb: "PedidoID", type: "number", required: true },
-                { name: "Usuario", namedb: "UsuarioID", type: "number", required: true },
-                { name: "Fecha de Factura", namedb: "FechaFactura", type: "string", required: true },
-                { name: "Total", namedb: "Total", type: "number", required: true },
-                { name: "Método de Pago", namedb: "MetodoPago", type: "string", required: true }
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Pedido", namedb: "pedido_id", type: "number", required: true },
+                { name: "Fecha Factura", namedb: "fecha_factura", type: "date", readonly: true },
+                { name: "Total", namedb: "total", type: "number", required: true },
+                { name: "Método de Pago", namedb: "metodo_pago", type: "string", required: true },
+                { name: "Estado", namedb: "estado", type: "string", readonly: true }
+            ],
+            relations: [{ name: "Pedido", fk: "pedido_id" }],
+            showInSlider: false
+        },
+        {
+            namedb: "log_insumo",
+            columns: [
+                { name: "ID", namedb: "id", type: "number", pk: true },
+                { name: "Insumo", namedb: "insumo_id", type: "number", required: true },
+                { name: "Usuario", namedb: "usuario_id", type: "number", required: true },
+                { name: "Fecha Movimiento", namedb: "fecha_movimiento", type: "date", readonly: true },
+                { name: "Tipo Movimiento", namedb: "tipo_movimiento", type: "string", required: true },
+                { name: "Cantidad", namedb: "cantidad", type: "number", required: true },
+                { name: "Motivo", namedb: "motivo", type: "string" }
             ],
             relations: [
-                { name: "Pedido", fk: "PedidoID" },
-                { name: "Usuario", fk: "UsuarioID" }
+                { name: "Insumo", fk: "insumo_id" },
+                { name: "Usuario", fk: "usuario_id" }
             ],
             showInSlider: false
         }
     ]
 };
+
 
 
 

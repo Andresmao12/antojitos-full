@@ -2,88 +2,93 @@ import { useState, useEffect } from 'react';
 import styles from './AddPostreModal.module.css';
 import buttonStyles from '../../../../styles/buttons.module.css';
 import { useApi } from '../../../../hooks/useApi';
-import { SHEMA_DB, PRODUCT_DETAILS } from '../../../../utils/constants';
-
+import { SHEMA_DB } from '../../../../utils/constants';
+// import * as cloudinaryService from '../../../../services/cloudinary';
 
 const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
-    const tableSchema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'producto');
-    const { namedb: tableName, columns, relations } = tableSchema;
+    const tableSchema = SHEMA_DB.tables.find(t => t.namedb?.toLowerCase() === 'producto');
+    const { namedb: tableName, columns } = tableSchema || {};
 
-    const { ingredientes: shemaingredientes, capas: shemaCapas } = PRODUCT_DETAILS;
+    const { fetchAll, createItem, dataFrom } = useApi(tableSchema);
 
-    const [ingredientes, setIngredientes] = useState(shemaingredientes);
-    const [capas, setCapa] = useState(shemaingredientes);
+    // ESTADOS
+    const [ingredientes, setIngredientes] = useState([]); // [{ insumoId, cantidad }]
+    const [capas, setCapas] = useState({}); // { capa1: { insumoId, cantidad }, ... }
     const [formData, setFormData] = useState({});
     const [imagePreview, setImagePreview] = useState(null);
 
-    const { dataFrom, fetchAll, createItem } = useApi(tableSchema);
+
+    // CARGA INICIAL DE INSUMOS Y TAMAÑOS
+    useEffect(() => {
+        (async () => {
+            try {
+                await fetchAll('insumo');
+                await fetchAll('tamanio');
+            } catch (e) {
+                console.error('Error haceiendo los fetch', e);
+            }
+        })();
+    }, []);
 
     useEffect(() => {
-        const firstCall = async () => {
-            await fetchAll('Insumo');
-        };
-        firstCall();
-    }, []);
+        console.log("ESTADO INGREDIENTES: ", ingredientes)
+        console.log("ESTADO CAPAS: ", capas)
+        console.log("FETCH INGREDIENTES: ", dataFrom['insumo'])
+        console.log("FETCH TAMANIOS: ", dataFrom['tamanio'])
+    }, [ingredientes, capas, dataFrom]);
+
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleImageUpload = async (file) => {
-        if (!file) {
-            console.error("⚠️ No se proporcionó archivo para subir.");
-            return;
-        }
+    // MANEJO DE LA IMAGEN
+    const UploadImage = async (e) => {
+        e.preventDefault();
 
+        let file = null;
+
+        try { file = e.dataTransfer.files?.[0]; }
+        catch { file = e.target.files?.[0]; }
+
+        if (!file) return;
         const formDataImg = new FormData();
-        formDataImg.append("file", file);
-        formDataImg.append("upload_preset", "unsigned_preset"); // Asegúrate que este es válido
+        formDataImg.append('file', file);
+        formDataImg.append('upload_preset', 'unsigned_preset');
 
         try {
-            const res = await fetch("https://api.cloudinary.com/v1_1/dkhznoxbv/image/upload", {
-                method: "POST",
+            const res = await fetch('https://api.cloudinary.com/v1_1/dkhznoxbv/image/upload', {
+                method: 'POST',
                 body: formDataImg,
             });
-
             const data = await res.json();
-            console.log("📦 Respuesta de Cloudinary:", data);
+            if (!res.ok) throw new Error(data.error?.message || 'Error upload');
 
-            if (!res.ok) throw new Error(data.error?.message || "Error desconocido");
-
-            setFormData(prev => ({ ...prev, UrlImagen: data.secure_url }));
+            setFormData(prev => ({ ...prev, url_imagen: data.secure_url }));
             setImagePreview(data.secure_url);
-
-            // Aquí sigue con la transformación
         } catch (err) {
-            console.error("💥 Error subiendo la imagen:", err.message);
+            console.error('Error uploading image', err);
         }
     };
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        const file = e.dataTransfer.files[0];
-        if (file) handleImageUpload(file);
-    };
+    const handleDragOver = (e) => e.preventDefault();
 
-    const handleImageSelect = (e) => {
-        const file = e.target.files[0];
-        if (file) handleImageUpload(file);
-    };
 
-    const handleDragOver = (e) => {
-        e.preventDefault();
-    };
-
+    // INGREDIENTES
     const handleIngredienteSubmit = (e) => {
         e.preventDefault();
         const ingrediente = formData['ingrediente'];
+        console.log("INGREDIENTE SELECCIONADO: ", ingrediente)
         const cantidad = formData["ingrediente-cantidad"];
         if (!ingrediente || !cantidad) return;
+
+        console.log('FORMDATA INGREDIENTE: ', formData)
         const nuevo = { "insumoId": ingrediente, cantidad };
         setIngredientes([...ingredientes, nuevo]);
     };
 
+    // CAPAS
     const handleCapaSubmit = (e) => {
         e.preventDefault();
         const ingrediente = formData['capa'];
@@ -95,39 +100,47 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
             ...capas,
             [nuevaClave]: { ingrediente, cantidad },
         };
-        setCapa(nuevaCapa);
+        setCapas(nuevaCapa);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const dataToSend = { ...formData, insumos: ingredientes, DatosProceso: JSON.stringify({ capas }) };
-            delete dataToSend?.capa;
-            delete dataToSend?.ingrediente;
-            if ("capa-cantidad" in dataToSend) delete dataToSend["capa-cantidad"];
-            if ("ingrediente-cantidad" in dataToSend) delete dataToSend["ingrediente-cantidad"];
-            console.log("Datos a enviar:", dataToSend);
+            const dataToSend = {
+                ...formData,
+                insumos: ingredientes,
+                datos_proceso: JSON.stringify({ capas }),
+            };
+
+            delete dataToSend.ingrediente;
+            delete dataToSend['ingrediente-cantidad'];
+            delete dataToSend.capa;
+            delete dataToSend['capa-cantidad'];
 
             await createItem(dataToSend);
-            // await handleRefresh();
-        } catch (e) {
-            console.log("Error creando el producto: ", e);
+            await handleRefresh?.();
+            handleShowModal();
+        } catch (err) {
+            console.error('Error creando producto', err);
         }
     };
+
+    const excludedNamedb = ['id', 'url_imagen', 'fecha_creacion', 'datos_proceso', 'plantilla_id', 'tamanio_id'];
 
     return (
         <div className={styles.modalOverlay}>
             <button className={`${buttonStyles.deleteButton} ${styles.btnCloseModal}`} onClick={handleShowModal}>
                 <i className="fa-solid fa-xmark"></i>
             </button>
+
             <form className={styles.formCont} onSubmit={handleSubmit}>
                 <h2>Añadir postre</h2>
 
-                {columns.map((column) => {
-                    const { name, namedb, type, required } = column;
-                    const excludedTypes = ['id', 'urlimagen']
-
-                    if (excludedTypes.includes(namedb.toLowerCase())) return null;
+                {/* Inputs schema */}
+                {Array.isArray(columns) && columns.map(col => {
+                    const { name, namedb, required } = col;
+                    if (!namedb) return null;
+                    if (excludedNamedb.includes(namedb.toLowerCase())) return null;
 
                     return (
                         <div className={styles.inpCont} key={namedb}>
@@ -137,65 +150,80 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                                 placeholder=" "
                                 required={required}
                                 onChange={handleChange}
-                                value={formData[namedb] || ''}
+                                value={formData[namedb] ?? ''}
                             />
                             <label htmlFor={`inp-${namedb}`}>{name}</label>
                         </div>
                     );
                 })}
-                <div
-                    className={styles.imageDropZone}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                >
+
+                {/* Tamaño */}
+                <h3>Tamaño</h3>
+                <div className={styles.inpGroup}>
+                    <div className={styles.selectCont}>
+                        <select
+                            id="inp-tamanio"
+                            className={styles.select}
+                            name="tamanio_id"
+                            onChange={handleChange}
+                            value={formData['tamanio_id'] ?? ''}
+                            required
+                        >
+                            <option value="">Seleccione tamaño...</option>
+                            {dataFrom['tamanio']?.map((element) => (
+                                <option key={element.id} value={element.id}>
+                                    {element.nombre}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* Imagen */}
+                <div className={styles.imageDropZone} onDrop={UploadImage} onDragOver={handleDragOver}>
                     <p>Arrastra una imagen aquí o</p>
-                    <input type="file" accept="image/*" onChange={handleImageSelect} />
+                    <input type="file" accept="image/*" onChange={UploadImage} />
                     {imagePreview && <img src={imagePreview} alt="Vista previa" className={styles.imagePreview} />}
                 </div>
 
+                {/* Ingredientes */}
                 <h3>Ingredientes</h3>
                 <div className={styles.inpGroup}>
                     <div className={styles.selectCont}>
                         <select
-                            id={`inp-ingrediente`}
+                            id="inp-ingrediente"
                             className={styles.select}
-                            name={`ingrediente`}
+                            name="ingrediente"
                             onChange={handleChange}
-                            value={formData[`ingrediente`] || ''}
+                            value={formData['ingrediente'] ?? ''}
                         >
-                            <option>Seleccione...</option>
-                            {dataFrom["Insumo"]?.map((insumo, idx) => (
-                                <option key={idx} value={insumo.Id}>{insumo.Nombre} - {insumo.Proveedor}</option>
+                            <option value="">Seleccione...</option>
+                            {dataFrom['insumo']?.map((element) => (
+                                <option key={element.id} value={element.id}>
+                                    {element.nombre}
+                                </option>
                             ))}
                         </select>
                     </div>
+
                     <div className={styles.inpCont}>
-                        <input
-                            id={`inp-ingrediente-cantidad`}
-                            name="ingrediente-cantidad"
-                            type='number'
-                            placeholder=" "
-                            onChange={handleChange}
-                        />
-                        <label htmlFor={`inp-cantidad`}>Cantidad</label>
+                        <input id="inp-ingrediente-cantidad" name="ingrediente-cantidad" type="number" placeholder=" " onChange={handleChange} value={formData['ingrediente-cantidad'] ?? ''} />
+                        <label htmlFor="inp-ingrediente-cantidad">Cantidad</label>
                     </div>
-                    <input
-                        type="button"
-                        value="+"
-                        className={`${buttonStyles.addButton} ${styles.addButton}`}
-                        onClick={handleIngredienteSubmit}
-                    />
+
+                    <input type="button" value="+" className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleIngredienteSubmit} />
                 </div>
 
                 <div className={styles.ingredientesCont}>
                     {ingredientes.map((ingrediente, idx) => (
                         <div key={idx} className={styles.ingredienteCont}>
-                            <span>{dataFrom['Insumo'].find(e => e.Id == ingrediente.insumoId)?.Nombre}</span>
+                            <span>{dataFrom['insumo']?.find(e => e.id == ingrediente.insumoId)?.nombre}</span>
                             <span>{ingrediente.cantidad}g</span>
                         </div>
                     ))}
                 </div>
 
+                {/* Capas */}
                 <h3>Capas</h3>
                 <div className={styles.inpGroup}>
                     <div className={styles.selectCont}>
@@ -208,9 +236,9 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                             value={formData[`capa`] || ''}
                         >
                             <option>Seleccione...</option>
-                            {ingredientes.map((insumo, idx) => (
-                                <option key={idx} value={insumo.Id}>{dataFrom['Insumo'].find(e => e.Id == insumo.insumoId)?.Nombre}</option>
-                            ))}
+                            {ingredientes.map((insumo, idx) => {
+                                return <option key={idx}> {dataFrom['insumo'].find(e => e.id == insumo.insumoId)?.nombre}</option>
+                            })}
                         </select>
                     </div>
                     <div className={styles.inpCont}>
@@ -242,9 +270,7 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                     ))}
                 </div>
 
-                <button className={buttonStyles.searchButton} type="submit">
-                    Guardar DatosProceso
-                </button>
+                <button className={buttonStyles.searchButton} type="submit">Guardar DatosProceso</button>
             </form>
         </div>
     );

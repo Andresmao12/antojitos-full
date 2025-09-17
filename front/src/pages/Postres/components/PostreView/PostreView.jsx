@@ -26,8 +26,8 @@ const PostreView = () => {
     useEffect(() => {
         const firstCall = async () => {
             await fetchById(id)
-            await fetchAll('Insumo')
-            await fetchAll("Producto_Insumo")
+            await fetchAll('insumo')
+            await fetchAll("producto_insumo")
         }
         firstCall()
     }, [])
@@ -35,8 +35,8 @@ const PostreView = () => {
 
     useEffect(() => {
 
-        if (item) {
-            const itemParse = JSON.parse(item.DatosProceso);
+        if (item && item.datos_proceso) {
+            const itemParse = JSON.parse(item.datos_proceso);
             setDataProceso(itemParse)
             console.log("-----> DATOS PROCESO DESPUESS DE  PASEAR: ", itemParse)
         }
@@ -64,18 +64,18 @@ const PostreView = () => {
         <div className={styles.container}>
             <div
                 className={styles.banner}
-                style={{ backgroundImage: `url(${item.UrlImagen})` }}
+                style={{ backgroundImage: `url(${item.url_imagen})` }}
             >
                 <div className={styles.overlay}>
-                    <h1 className={styles.title}>{item.Nombre}</h1>
-                    <p className={styles.description}>{item.Descripcion}</p>
+                    <h1 className={styles.title}>{item.nombre}</h1>
+                    <p className={styles.description}>{item.descripcion}</p>
                 </div>
             </div>
 
             <div className={styles.details}>
-                <p><strong>Creado:</strong> {new Date(item.FechaCreacion).toLocaleString()}</p>
+                <p><strong>Creado:</strong> {new Date(item.fecha_creacion).toLocaleString()}</p>
                 <div className={styles.precioCont}>
-                    <p><strong>Precio ➜</strong> ${item.PrecioVenta}</p>
+                    <p><strong>Precio ➜</strong> ${item.precio_venta}</p>
                     <p><strong>Tamaño ➜</strong> {item.Tamanio}</p>
                 </div>
 
@@ -87,21 +87,20 @@ const PostreView = () => {
                     <section className={styles.ingrentesSection}>
                         <h3>Ingredientes</h3>
 
-                        {dataFrom["Producto_Insumo"]?.length === 0 ? (
+                        {!dataFrom["producto_insumo"] ? (
                             <p>No se han registrado ingredientes.</p>
                         ) : (
                             <div className={styles.ingredientesCont}>
-                                {dataFrom["Producto_Insumo"]?.map((item, index) => {
+                                {dataFrom["producto_insumo"]?.map((item, index) => {
 
-                                    console.log("ITEM.PRODUCTID = ", item.ProductoID, "ID: ", id, "CONDICION : ", item.ProductoID != id)
-                                    if (item.ProductoID != id) return
+                                    if (item.producto_id != id) return
 
-                                    const insumo = dataFrom["Insumo"].find(i => i.Id === item.InsumoID);
-
+                                    const insumo = dataFrom["insumo"]?.find(i => i.id === item.insumo_id);
+                                    console.log("-----> INSUMO ENCONTRADO: ", insumo)
                                     return (
                                         <div key={index} className={styles.ingredienteCont}>
-                                            <span> {insumo?.Nombre || 'Insumo desconocido'}</span>
-                                            <span>{item.CantidadUsada}</span>
+                                            <span> {insumo?.nombre || 'Insumo desconocido'}</span>
+                                            <span>{item.cantidad_usada}</span>
                                         </div>
                                     );
                                 })}
@@ -144,7 +143,7 @@ const PostreView = () => {
                                 }}
                             >
                                 <select name="" id="">
-                                    {dataFrom['Insumo'].map((insumo, idx) => (
+                                    {dataFrom['insumo'].map((insumo, idx) => (
                                         <option key={idx} value={insumo.Id}>{insumo.Nombre}</option>
                                     ))}
                                 </select>

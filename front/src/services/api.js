@@ -54,6 +54,7 @@ export const getById = async (tableSchema, id) => {
 export const create = async (tableSchema, data) => {
     try {
         const { namedb } = tableSchema;
+        console.log("DATA EN API CREATE: ", data)
 
         const res = await fetch(`${API_ROUTE}/${namedb}`, {
             method: 'POST',

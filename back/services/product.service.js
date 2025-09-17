@@ -31,30 +31,41 @@ export const getProductById = async (id) => {
 };
 
 export const createProduct = async (data) => {
-    const { Nombre, UrlImagen, Descripcion, TamanioID, DatosProceso, PrecioVenta, PlantillaID, insumos = [] } = data;
+    const {
+        nombre,
+        url_imagen,
+        descripcion,
+        tamanio_id,
+        datos_proceso,
+        precio_venta,
+        plantilla_id = null,
+        insumos = []
+    } = data;
+
+    console.log("DATA RECIBIDA EN SERVICE: ", data);
 
     const client = await pool.connect();
     try {
         await client.query('BEGIN');
 
         const queryProducto = `
-      INSERT INTO producto (nombre, urlimagen, descripcion, precioVenta, datosProceso, tamanioid, plantillaid)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
-      RETURNING id
-    `;
+            INSERT INTO producto (nombre, url_imagen, descripcion, precio_venta, datos_proceso, tamanio_id, plantilla_id)
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            RETURNING id
+        `;
         console.log(`----> EJECUTANDO QUERY Producto: "${queryProducto}"`);
 
         const resultProd = await client.query(queryProducto, [
-            Nombre, UrlImagen, Descripcion, PrecioVenta, DatosProceso, TamanioID, PlantillaID
+            nombre, url_imagen, descripcion, precio_venta, datos_proceso, tamanio_id,  plantilla_id
         ]);
 
         const productoId = resultProd.rows[0].id;
 
         if (insumos.length > 0) {
             const queryInsumo = `
-        INSERT INTO producto_insumo (insumoid, productoid, cantidad, preciounitario)
-        VALUES ($1, $2, $3, $4)
-      `;
+                INSERT INTO producto_insumo (insumo_id, producto_id, cantidad, precio_unitario)
+                VALUES ($1, $2, $3, $4)
+            `;
             console.log(`----> EJECUTANDO QUERY Insumos: "${queryInsumo}"`);
 
             for (const insumo of insumos) {

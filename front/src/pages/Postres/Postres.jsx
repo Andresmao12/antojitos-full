@@ -62,7 +62,7 @@ const Postres = () => {
             <div className={styles.cardCont}>
                 {Array.isArray(data) &&
                     data.map((element, i) =>
-                        <PostreCard key={i} id={element.Id} title={element.Nombre} desc={element.Descripcion} img={element.UrlImagen} tableShema={tableShema} />
+                        <PostreCard key={i} id={element.id} title={element.nombre} desc={element.descripcion} img={element.url_imagen} tamanio={element.tamanio_id} tableShema={tableShema} />
                     )}
             </div>}
     </>

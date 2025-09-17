@@ -12,9 +12,7 @@ const Dashboard = () => {
         return saved ? JSON.parse(saved) : [];
     });
 
-
     const tableShema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'insumo')
-    console.log("TABLESHEMA A PASAR DESDE INSUMOS: ----> ", tableShema)
     const { fetchAll, dataFrom } = useApi(tableShema)
 
     useEffect(() => {
@@ -48,17 +46,14 @@ const Dashboard = () => {
         egresos,
         insumosRequeridos
     } = data;
-    console.log("INSREQ", insumosRequeridos)
 
-    console.log("DATA EN DATAA: ",  data)
-
+    // Ordenar postres (usa campos del back: nombre, tamanioid, cantidadtotal)
     const postresOrdenados = [...postresPendientes].sort((a, b) => {
-        if (a.Nombre < b.Nombre) return -1;
-        if (a.Nombre > b.Nombre) return 1;
+        if (a.nombre < b.nombre) return -1;
+        if (a.nombre > b.nombre) return 1;
 
-        // Si los nombres son iguales, ordenar por tamaño
-        if (a.Tamanio < b.Tamanio) return -1;
-        if (a.Tamanio > b.Tamanio) return 1;
+        if (a.tamanioid < b.tamanioid) return -1;
+        if (a.tamanioid > b.tamanioid) return 1;
 
         return 0;
     });
@@ -72,10 +67,9 @@ const Dashboard = () => {
         localStorage.setItem("checkedPostres", JSON.stringify(newChecked));
     };
 
-
-    // Convertir array de estados a objeto tipo { pendiente: X, preparado: Y, entregado: Z }
+    // Convertir array de estados a objeto { pendiente: X, preparado: Y, entregado: Z }
     const estadoMap = pedidosPorEstado.reduce((acc, item) => {
-        acc[item.Estado] = item.Total;
+        acc[item.estado.toLowerCase()] = parseInt(item.total);
         return acc;
     }, {});
 
@@ -102,11 +96,11 @@ const Dashboard = () => {
             <section className={styles.cardSection}>
                 <div className={`${styles.card} ${styles.ingresos}`}>
                     <h3>Ingresos</h3>
-                    <p>${ingresos.toFixed(2)}</p>
+                    <p>${Number(ingresos).toFixed(2)}</p>
                 </div>
                 <div className={`${styles.card} ${styles.egresos}`}>
                     <h3>Egresos</h3>
-                    <p>${egresos.toFixed(2)}</p>
+                    <p>${Number(egresos).toFixed(2)}</p>
                 </div>
             </section>
 
@@ -115,11 +109,13 @@ const Dashboard = () => {
                     <h3>Insumos requeridos (pendientes)</h3>
                     <ul>
                         {insumosRequeridos.map((insumo) => {
-                            const info = dataFrom["Insumo"]?.find(i => i.Id === insumo.InsumoID)
+                            const info = dataFrom["Insumo"]?.find(i => i.Id === insumo.insumoid)
 
                             return (
-                                <li key={insumo.InsumoID}>
-                                    {info ? `${info.Nombre}: ${Math.round(insumo.CantidadTotal)}g` : `ID ${insumo.InsumoID}: ${Math.round(insumo.CantidadTotal)}g`}
+                                <li key={insumo.insumoid}>
+                                    {info
+                                        ? `${info.Nombre}: ${Math.round(insumo.cantidadtotal)}g`
+                                        : `ID ${insumo.insumoid}: ${Math.round(insumo.cantidadtotal)}g`}
                                 </li>
                             );
                         })}
@@ -138,9 +134,9 @@ const Dashboard = () => {
                                 <div className={styles.checkIcon}>
                                     {checkedPostres.includes(index) && <span>✔</span>}
                                 </div>
-                                <h4>{item.Nombre}</h4>
-                                <p><strong>Tamaño:</strong> {item.Tamanio}</p>
-                                <p><strong>Cantidad:</strong> {item.CantidadTotal}</p>
+                                <h4>{item.nombre}</h4>
+                                <p><strong>Tamaño:</strong> {item.tamanioid}</p>
+                                <p><strong>Cantidad:</strong> {item.cantidadtotal}</p>
                             </div>
                         ))}
                     </div>

@@ -32,6 +32,7 @@ const DynamicForm = ({ tableSchema, regiterData, showCreate, handleRefresh }) =>
             dataConDefaults[namedb] = (valor !== undefined && valor !== '') ? valor : valueDefault;
         });
 
+        console.log('---> DATA TO SEND IN FETCH: ', dataConDefaults)
         await createItem(dataConDefaults)
         await handleRefresh()
         showCreate()

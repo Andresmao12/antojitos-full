@@ -4,8 +4,11 @@ export const getAllInsumos = async () => {
     try {
         const query = `SELECT * FROM Insumo`;
         console.log(`----> EJECUTANDO QUERY: ${query}`);
+
         const result = await pool.query(query);
+        console.log(result.rows);
         return result.rows;
+
     } catch (error) {
         throw new Error(error.message);
     }
@@ -24,14 +27,16 @@ export const getInsumoById = async (id) => {
 
 export const createInsumo = async (data) => {
     const client = await pool.connect();
+
+    console.log("DATA RECIBIDA EN SERVICE: ", data)
     try {
         const {
-            Nombre,
-            Proveedor,
-            Cantidad_Unidad,
-            Precio_Unidad,
-            Compuesto,
-            CantidadDisponible = 0,
+            nombre,
+            proveedor,
+            cantidad_unidad,
+            precio_unidad,
+            compuesto,
+            cantidad_disponible = 0,
             ingredientes = [],
         } = data;
 
@@ -40,7 +45,7 @@ export const createInsumo = async (data) => {
         const query1 = `
       INSERT INTO insumo (
         nombre, proveedor, cantidad_unidad,
-        precio_unidad, compuesto, cantidaddisponible
+        precio_unidad, compuesto, cantidad_disponible
       )
       VALUES ($1, $2, $3, $4, $5, $6)
       RETURNING id
@@ -49,19 +54,19 @@ export const createInsumo = async (data) => {
         console.log(`----> EJECUTANDO QUERY: ${query1}`);
 
         const result = await client.query(query1, [
-            Nombre,
-            Proveedor,
-            Cantidad_Unidad,
-            Precio_Unidad,
-            Compuesto,
-            CantidadDisponible,
+            nombre,
+            proveedor,
+            cantidad_unidad,
+            precio_unidad,
+            compuesto,
+            cantidad_disponible,
         ]);
 
         const nuevoId = result.rows[0].id;
 
-        if (Compuesto && ingredientes.length > 0) {
+        if (compuesto && ingredientes.length > 0) {
             const query2 = `
-        INSERT INTO insumo_composicion (insumocompuestoid, ingredienteid, cantidadporgramo)
+        INSERT INTO insumo_composicion (insumo_compuesto_id, ingrediente_id, cantidad_por_gramo)
         VALUES ($1, $2, $3)
       `;
             for (const ing of ingredientes) {

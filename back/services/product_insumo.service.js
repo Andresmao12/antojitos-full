@@ -6,8 +6,8 @@ export const getAllProduct_Insumo = async () => {
         const query = `
       SELECT pi.*, p.Nombre AS Producto, i.Nombre AS Insumo
       FROM producto_insumo pi
-      JOIN producto p ON pi.productoid = p.id
-      JOIN insumo i ON pi.insumoid = i.id
+      JOIN producto p ON pi.producto_id = p.id
+      JOIN insumo i ON pi.insumo_id = i.id
     `;
         console.log(`----> EJECUTANDO QUERY... "${query}"`);
 

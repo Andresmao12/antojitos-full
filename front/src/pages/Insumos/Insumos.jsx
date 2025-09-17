@@ -16,9 +16,9 @@ import { useApi } from '../../hooks/useApi'
 const Insumos = () => {
     console.log('SHEMA_DB', SHEMA_DB)
 
-    const tableShema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'insumo')
-    console.log("TABLESHEMA A PASAR DESDE INSUMOS: ----> ", tableShema)
-    const { data, fetchAll, fetchById, createItem, updateItem, deleteItem, loading, error, item } = useApi(tableShema)
+    const tableSchema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'insumo')
+    console.log("TABLEScHEMA A PASAR DESDE INSUMOS: ----> ", tableSchema)
+    const { data, fetchAll, fetchById, createItem, updateItem, deleteItem, loading, error, item } = useApi(tableSchema)
     const [formData, setFormData] = useState({})
     const [showCreate, setShowCreate] = useState(false)
 
@@ -42,9 +42,9 @@ const Insumos = () => {
                 <SearchInput />
                 <button className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleShowCreate}>Añadir</button>
             </div>
-            {showCreate && <AddInsumoModal tableSchema={tableShema} handleShowModal={handleShowCreate} handleRefresh={handleRefresh} />}
+            {showCreate && <AddInsumoModal tableSchema={tableSchema} handleShowModal={handleShowCreate} handleRefresh={handleRefresh} />}
             <div className={styles.registersCont}>
-                <DataTable data={data} />
+                <DataTable data={data} schema={tableSchema}/>
             </div>
         </>
     )

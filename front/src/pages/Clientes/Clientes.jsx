@@ -35,7 +35,7 @@ const Clientes = () => {
         await fetchAll()
         setShowCreate(false)
     }
-
+    console.log("data", data)
     return (
         <>
             <div className={styles.searchAddCont}>
@@ -44,7 +44,7 @@ const Clientes = () => {
             </div>
             {showCreate && <DynamicForm tableSchema={tableSchema} regiterData={formData} showCreate={handleShowCreate} handleRefresh={handleRefresh} />}
             <div className={styles.registersCont}>
-                <DataTable data={data} />
+                <DataTable data={data} schema={tableSchema}/>
             </div>
         </>
     )

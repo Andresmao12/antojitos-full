@@ -23,7 +23,7 @@ export const getOrderById = async (req, res) => {
 
 export const createOrder = async (req, res) => {
     try {
-        const result = await orderService.createOrder();
+        const result = await orderService.createOrder(req.body);
         res.json(result);
     } catch (error) {
         console.error('-- Error al obtener un product:', error);

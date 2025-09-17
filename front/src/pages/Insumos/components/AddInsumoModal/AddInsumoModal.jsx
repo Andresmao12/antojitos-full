@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import styles from "./AddInsumoModal.module.css";
 import buttonStyles from "../../../../styles/buttons.module.css";
 import { useApi } from "../../../../hooks/useApi";
@@ -9,7 +9,10 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
     const [ingredientes, setIngredientes] = useState([]);
     const [esCompuesto, setEsCompuesto] = useState(false);
 
-    const tableShema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'insumo')
+    
+    const tableShema = SHEMA_DB.tables.find(
+        element => element.namedb?.toLowerCase() === "insumo"
+    );
     const { fetchAll, createItem, dataFrom } = useApi(tableShema);
 
     useEffect(() => {
@@ -21,7 +24,7 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
         const finalValue = type === "checkbox" ? checked : value;
         setFormData({ ...formData, [name]: finalValue });
 
-        if (name === "Compuesto") setEsCompuesto(checked);
+        if (name === "compuesto") setEsCompuesto(checked);
     };
 
     const handleAddIngrediente = () => {
@@ -46,15 +49,16 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         const insumoPayload = {
-            Nombre: formData.Nombre,
-            Proveedor: formData.Proveedor,
-            Presentacion: formData.Presentacion,
-            CantidadPorPresentacion: parseFloat(formData.CantidadPorPresentacion),
-            PrecioPresentacion: parseFloat(formData.PrecioPresentacion),
-            Compuesto: esCompuesto ? 1 : 0,
-            CantidadDisponible: parseFloat(formData.CantidadDisponible || 0),
-            ingredientes: esCompuesto ? ingredientes : []
+            nombre: formData.nombre,
+            proveedor: formData.proveedor,
+            cantidad_unidad: parseFloat(formData.cantidad_unidad),
+            precio_unidad: parseFloat(formData.precio_unidad),
+            compuesto: esCompuesto,
+            cantidad_disponible: parseFloat(formData.cantidad_disponible || 0),
+            ingredientes: esCompuesto ? ingredientes : [],
         };
+
+        console.log("PAYLOAD INSUMO: ", insumoPayload);
 
         try {
             await createItem(insumoPayload);
@@ -67,7 +71,10 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
 
     return (
         <div className={styles.modalOverlay}>
-            <button className={`${buttonStyles.deleteButton} ${styles.btnCloseModal}`} onClick={handleShowModal}>
+            <button
+                className={`${buttonStyles.deleteButton} ${styles.btnCloseModal}`}
+                onClick={handleShowModal}
+            >
                 <i className="fa-solid fa-xmark"></i>
             </button>
 
@@ -75,33 +82,48 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
                 <h2>Registrar Insumo</h2>
 
                 <div className={styles.inpCont}>
-                    <input name="Nombre" placeholder=" " onChange={handleChange} required />
-                    <label htmlFor="Nombre">Nombre</label>
+                    <input name="nombre" placeholder=" " onChange={handleChange} required />
+                    <label htmlFor="nombre">Nombre</label>
                 </div>
 
                 <div className={styles.inpCont}>
-                    <input name="Proveedor" placeholder=" " onChange={handleChange} required />
-                    <label htmlFor="Proveedor">Proveedor</label>
+                    <input name="proveedor" placeholder=" " onChange={handleChange} required />
+                    <label htmlFor="proveedor">Proveedor</label>
                 </div>
 
                 <div className={styles.inpCont}>
-                    <input name="Presentacion" placeholder=" " onChange={handleChange} required />
-                    <label htmlFor="Presentacion">Presentación</label>
+                    <input
+                        name="cantidad_unidad"
+                        type="number"
+                        step="0.01"
+                        placeholder=" "
+                        onChange={handleChange}
+                        required
+                    />
+                    <label htmlFor="cantidad_unidad">Cantidad por unidad</label>
                 </div>
 
                 <div className={styles.inpCont}>
-                    <input name="CantidadPorPresentacion" type="number" placeholder=" " onChange={handleChange} required />
-                    <label htmlFor="CantidadPorPresentacion">Cantidad por Presentación</label>
+                    <input
+                        name="precio_unidad"
+                        type="number"
+                        step="0.01"
+                        placeholder=" "
+                        onChange={handleChange}
+                        required
+                    />
+                    <label htmlFor="precio_unidad">Precio por unidad</label>
                 </div>
 
                 <div className={styles.inpCont}>
-                    <input name="PrecioPresentacion" type="number" placeholder=" " onChange={handleChange} required />
-                    <label htmlFor="PrecioPresentacion">Precio Presentación</label>
-                </div>
-
-                <div className={styles.inpCont}>
-                    <input name="CantidadDisponible" type="number" placeholder=" " onChange={handleChange} />
-                    <label htmlFor="CantidadDisponible">Cantidad Disponible</label>
+                    <input
+                        name="cantidad_disponible"
+                        type="number"
+                        step="0.01"
+                        placeholder=" "
+                        onChange={handleChange}
+                    />
+                    <label htmlFor="cantidad_disponible">Cantidad disponible</label>
                 </div>
 
                 <div className={styles.checkboxWrapper}>
@@ -109,7 +131,7 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
                         ¿Es compuesto?
                         <input
                             type="checkbox"
-                            name="Compuesto"
+                            name="compuesto"
                             checked={esCompuesto}
                             onChange={handleChange}
                             className={styles.switchInput}
@@ -117,6 +139,7 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
                         <span className={styles.slider}></span>
                     </label>
                 </div>
+
                 {esCompuesto && (
                     <>
                         <h3>Ingredientes</h3>
@@ -129,9 +152,9 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
                                     value={formData.ingrediente || ""}
                                 >
                                     <option>Seleccione ingrediente...</option>
-                                    {dataFrom["Insumo"]?.filter(i => !i.Compuesto).map((insumo) => (
-                                        <option key={insumo.Id} value={insumo.Id}>
-                                            {insumo.Nombre}
+                                    {dataFrom["Insumo"]?.filter(i => !i.compuesto).map((insumo) => (
+                                        <option key={insumo.id} value={insumo.id}>
+                                            {insumo.nombre}
                                         </option>
                                     ))}
                                 </select>
@@ -140,6 +163,7 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
                                 <input
                                     name="ingrediente-cantidad"
                                     type="number"
+                                    step="0.01"
                                     placeholder=" "
                                     onChange={handleChange}
                                     value={formData["ingrediente-cantidad"] || ""}
@@ -156,10 +180,10 @@ const AddInsumoModal = ({ handleShowModal, handleRefresh }) => {
 
                         <div className={styles.ingredientesCont}>
                             {ingredientes.map((item, idx) => {
-                                const insumo = dataFrom["Insumo"]?.find(i => i.Id == item.insumoId);
+                                const insumo = dataFrom["Insumo"]?.find(i => i.id == item.insumoId);
                                 return (
                                     <div key={idx} className={styles.ingredienteCont}>
-                                        <span>{insumo?.Nombre}</span>
+                                        <span>{insumo?.nombre}</span>
                                         <span>{item.cantidadPorGramo} g</span>
                                     </div>
                                 );

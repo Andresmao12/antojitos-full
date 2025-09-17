@@ -27,18 +27,18 @@ export const getUserById = async (id) => {
 };
 
 export const createUser = async (data) => {
-    const { Nombre, Correo, RolID, Celular, Direccion } = data;
+    const { nombre, correo, rol_id, celular, direccion } = data;
 
     try {
         const query = `
-      INSERT INTO usuario (nombre, correo, rolid, celular, direccion)
+      INSERT INTO usuario (nombre, correo, rol_id, celular, direccion)
       VALUES ($1, $2, $3, $4, $5)
       RETURNING id
     `;
         console.log(`----> EJECUTANDO QUERY: ${query}`);
 
         const result = await pool.query(query, [
-            Nombre, Correo, RolID || 1, Celular, Direccion
+            nombre, correo, rol_id || 1, celular, direccion
         ]);
 
         return { message: 'Usuario creado exitosamente', id: result.rows[0].id };

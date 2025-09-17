@@ -24,7 +24,7 @@ export const getInsumoById = async (req, res) => {
 
 export const createInsumo = async (req, res) => {
     try {
-        const result = await insumoService.createInsumo();
+        const result = await insumoService.createInsumo(req.body);
         res.json(result);
     } catch (error) {
         console.error('-- Error crear un insumo:', error);
