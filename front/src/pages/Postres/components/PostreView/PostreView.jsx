@@ -27,6 +27,7 @@ const PostreView = () => {
         const firstCall = async () => {
             await fetchById(id)
             await fetchAll('insumo')
+            await fetchAll('tamanio')
             await fetchAll("producto_insumo")
         }
         firstCall()
@@ -76,7 +77,7 @@ const PostreView = () => {
                 <p><strong>Creado:</strong> {new Date(item.fecha_creacion).toLocaleString()}</p>
                 <div className={styles.precioCont}>
                     <p><strong>Precio ➜</strong> ${item.precio_venta}</p>
-                    <p><strong>Tamaño ➜</strong> {item.Tamanio}</p>
+                    <p><strong>Tamaño ➜</strong> {dataFrom['tamanio']?.find((t) => t.id === item.tamanio_id)?.nombre}</p>
                 </div>
 
                 <div className={styles.datosProcesoCont}>
@@ -96,7 +97,6 @@ const PostreView = () => {
                                     if (item.producto_id != id) return
 
                                     const insumo = dataFrom["insumo"]?.find(i => i.id === item.insumo_id);
-                                    console.log("-----> INSUMO ENCONTRADO: ", insumo)
                                     return (
                                         <div key={index} className={styles.ingredienteCont}>
                                             <span> {insumo?.nombre || 'Insumo desconocido'}</span>

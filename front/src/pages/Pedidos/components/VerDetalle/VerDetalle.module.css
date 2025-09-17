@@ -109,31 +109,47 @@
 
 
 
-
-
 .estadoSelector {
-  display: flex;
-  gap: 0.5rem;
-  margin: 1rem 0;
-  flex-wrap: wrap;
+    display: flex;
+    gap: 0.5rem;
+    margin: 1rem 0;
+    flex-wrap: wrap;
 }
 
 .estadoBtn {
-  padding: 0.4rem 0.8rem;
-  border: 1px solid #ccc;
-  background-color: white;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid #ccc;
+    background-color: white;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
+/* Hover base */
 .estadoBtn:hover {
-  background-color: #f0f0f0;
+    background-color: #f0f0f0;
 }
 
+/* Estado actual en BD */
+.estadoBtn.actual {
+    background-color: #ddd;
+    color: #555;
+    border-color: #bbb;
+    cursor: default;
+    /* no clickeable porque ya es el estado real */
+}
+
+/* Estado nuevo seleccionado por el usuario */
+.estadoBtn.nuevo {
+    background-color: var(--primary-color, #ffb347);
+    color: white;
+    border-color: var(--secondary-color, #e09930);
+}
+
+/* Si además quieres mantener el "active" genérico */
 .estadoBtn.active {
-  background-color: var(--primary-color);
-  color: white;
-  border-color:  var(--secondary-color);
+    background-color: var(--primary-color, #ffb347);
+    color: white;
+    border-color: var(--secondary-color, #e09930);
 }

@@ -39,6 +39,7 @@ create table insumo (
     cantidad_unidad numeric(10,2),
     precio_unidad numeric(10,2) default 0,
     compuesto boolean default false,
+    cantidad_reservada NUMERIC(12,2) DEFAULT 0,
     precio_gramo numeric(10,2) generated always as (
         case 
             when cantidad_unidad > 0 then precio_unidad / cantidad_unidad

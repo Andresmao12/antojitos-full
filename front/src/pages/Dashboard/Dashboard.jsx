@@ -4,6 +4,21 @@ import { useApi } from '../../hooks/useApi'
 
 import { SHEMA_DB } from '../../utils/constants'
 
+// PENDIENTES:
+// IMPLEMENTAR ESTADO DE TIPO DE TRANSACCION DENTRO DE LOS LOGS PARA NO RESTAR INSUMOS INMEDIATAMENTE AL REGISTRAR UN PEDIDO
+// IMPLEMENTAR LAS PLANTILLAS
+// ARREGLAR DASHBOARD
+/*
+    Este dashboard no utiliza IA actualmente.
+    Sin embargo, podrías usar IA para:
+    - Predecir demanda de insumos/postres.
+    - Detectar anomalías en ingresos/egresos.
+    - Recomendar compras de insumos.
+    - Analizar patrones de pedidos.
+    - Automatizar respuestas a clientes.
+    - Generar reportes inteligentes.
+*/
+
 const Dashboard = () => {
     const [data, setData] = useState(null);
 

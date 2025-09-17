@@ -13,7 +13,7 @@ export const getAllOrders = async (req, res) => {
 
 export const getOrderById = async (req, res) => {
     try {
-        const result = await orderService.getOrderById();
+        const result = await orderService.getOrderById(req.params.id);
         res.json(result);
     } catch (error) {
         console.error('-- Error al obtener un product:', error);
@@ -34,7 +34,7 @@ export const createOrder = async (req, res) => {
 
 export const updateOrderState = async (req, res) => {
     try {
-        const result = await orderService.updateOrderState();
+        const result = await orderService.updateOrderState(req.params.id, req.body);
         res.json(result);
     } catch (error) {
         console.error('-- Error al obtener un product:', error);
