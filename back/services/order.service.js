@@ -50,25 +50,22 @@ export const createOrder = async (data) => {
     try {
         await client.query("BEGIN");
 
-        // 1. Crear pedido
-        const query = `
-            INSERT INTO pedido (usuario_id, estado)
-            VALUES ($1, 'PENDIENTE')
-            RETURNING id
-        `;
-        const pedidoResult = await client.query(query, [UsuarioID]);
+        // 1. Crear pedido en estado PENDIENTE
+        const pedidoResult = await client.query(
+            `INSERT INTO pedido (usuario_id, estado)
+             VALUES ($1, 'PENDIENTE') RETURNING id`,
+            [UsuarioID]
+        );
         const pedidoId = pedidoResult.rows[0].id;
 
-        // Cache insumos compuestos y composiciones
-        const insumosCompuestosRes = await client.query(`SELECT id FROM insumo WHERE compuesto = true`);
-        const idsCompuestos = insumosCompuestosRes.rows.map(row => row.id);
+        // Obtener insumos compuestos y composiciones
+        const idsCompuestosRes = await client.query(`SELECT id FROM insumo WHERE compuesto = true`);
+        const idsCompuestos = idsCompuestosRes.rows.map(r => r.id);
         const composicionesRes = await client.query(`SELECT * FROM insumo_composicion`);
         const composiciones = composicionesRes.rows;
 
-        // ⚡ Array para acumular faltantes
         const faltantes = [];
 
-        // 2. Procesar productos del pedido
         for (const item of productos) {
             const productoId = parseInt(item.ProductoID);
             const cantidad = parseFloat(item.Cantidad);
@@ -77,66 +74,63 @@ export const createOrder = async (data) => {
                 throw new Error(`Datos inválidos en el producto: ${JSON.stringify(item)}`);
             }
 
-            // Insert detalle del pedido
+            // Insert detalle
             await client.query(
                 `INSERT INTO pedido_detalle (pedido_id, producto_id, cantidad)
                  VALUES ($1, $2, $3)`,
                 [pedidoId, productoId, cantidad]
             );
 
-            // Obtener insumos de ese producto
-            const insumosResult = await client.query(`
-                SELECT insumo_id, cantidad AS cantidad_usada
-                FROM producto_insumo
-                WHERE producto_id = $1
-            `, [productoId]);
+            // Obtener insumos del producto
+            const insumosResult = await client.query(
+                `SELECT insumo_id, cantidad AS cantidad_usada
+                 FROM producto_insumo WHERE producto_id = $1`,
+                [productoId]
+            );
 
-            // 3. Validar y reservar stock
             for (const insumo of insumosResult.rows) {
                 const cantidadTotal = insumo.cantidad_usada * cantidad;
 
-                // Stock actual del insumo
-                const stockRes = await client.query(`
-                    SELECT cantidad_disponible, cantidad_reservada, precio_unidad
-                    FROM insumo WHERE id = $1
-                `, [insumo.insumo_id]);
-
-                const { cantidad_disponible, cantidad_reservada, precio_unidad } = stockRes.rows[0];
+                const stockRes = await client.query(
+                    `SELECT cantidad_disponible, cantidad_reservada, precio_gramo
+                     FROM insumo WHERE id = $1`,
+                    [insumo.insumo_id]
+                );
+                const { cantidad_disponible, cantidad_reservada, precio_gramo } = stockRes.rows[0];
                 const stockLibre = cantidad_disponible - cantidad_reservada;
 
                 if (stockLibre < cantidadTotal) {
-                    const faltante = cantidadTotal - stockLibre;
                     faltantes.push({
                         insumo_id: insumo.insumo_id,
-                        faltante,
-                        costo_faltante: faltante * precio_unidad
+                        faltante: cantidadTotal - stockLibre,
+                        costo_faltante: (cantidadTotal - stockLibre) * precio_gramo
                     });
                 }
 
-                // En vez de descontar, solo reservamos
-                await client.query(`
-                    UPDATE insumo
-                    SET cantidad_reservada = cantidad_reservada + $1,
-                        fecha_actualizacion = NOW()
-                    WHERE id = $2
-                `, [cantidadTotal, insumo.insumo_id]);
+                // Reservar insumo
+                await client.query(
+                    `UPDATE insumo
+                     SET cantidad_reservada = cantidad_reservada + $1,
+                         fecha_actualizacion = NOW()
+                     WHERE id = $2`,
+                    [cantidadTotal, insumo.insumo_id]
+                );
 
-                // Log de reserva
-                await client.query(`
-                    INSERT INTO log_insumo (insumo_id, usuario_id, tipo_movimiento, cantidad, motivo)
-                    VALUES ($1, $2, 'AJUSTE', $3, $4)
-                `, [
-                    insumo.insumo_id,
-                    UsuarioID,
-                    cantidadTotal,
-                    `Reserva por pedido ID ${pedidoId}, producto ${productoId}`
-                ]);
+                // Log reserva
+                await client.query(
+                    `INSERT INTO log_insumo (insumo_id, usuario_id, tipo_movimiento, cantidad, motivo)
+                     VALUES ($1, $2, 'RESERVA', $3, $4)`,
+                    [
+                        insumo.insumo_id,
+                        UsuarioID,
+                        cantidadTotal,
+                        `Reserva por pedido ${pedidoId}, producto ${productoId}`
+                    ]
+                );
             }
         }
 
         await client.query("COMMIT");
-
-        // ✅ Retornamos el pedido creado + alertas de faltantes
         return { success: true, pedidoId, faltantes };
 
     } catch (error) {
@@ -148,88 +142,100 @@ export const createOrder = async (data) => {
     }
 };
 
-export const updateOrderState = async (id, data) => {
-    console.log("-----> ID ENTRANTE PARA UPDATE: ", id, data)
-    let Estado = data.Estado.toUpperCase();
-    if(Estado.includes(" ")) Estado = Estado.replace(" ", "_");
 
+export const updateOrderState = async (id, data) => {
     const client = await pool.connect();
+    let Estado = data.Estado.toUpperCase();
+    if (Estado.includes(" ")) Estado = Estado.replace(" ", "_");
 
     try {
         await client.query("BEGIN");
 
-        await client.query(`
-            UPDATE pedido
-            SET estado = $1
-            WHERE id = $2
-        `, [Estado, id]);
+        // Actualizar estado
+        await client.query(`UPDATE pedido SET estado = $1 WHERE id = $2`, [Estado, id]);
 
-        console.log(`✅ Estado del pedido ${id} actualizado a ${Estado}`);
+        // Obtener detalles del pedido
+        const detalles = await client.query(
+            `SELECT producto_id, cantidad FROM pedido_detalle WHERE pedido_id = $1`,
+            [id]
+        );
 
-        // ⚡ Cuando pasa a COMPLETADO → descontar insumos
-        if (Estado.toUpperCase() === "COMPLETADO") {
-            const detalles = await client.query(`
-                SELECT producto_id, cantidad
-                FROM pedido_detalle
-                WHERE pedido_id = $1
-            `, [id]);
+        for (const detalle of detalles.rows) {
+            const { producto_id, cantidad } = detalle;
+            const insumosResult = await client.query(
+                `SELECT insumo_id, cantidad AS cantidad_usada
+                 FROM producto_insumo WHERE producto_id = $1`,
+                [producto_id]
+            );
 
-            for (const detalle of detalles.rows) {
-                const { producto_id, cantidad } = detalle;
+            for (const insumo of insumosResult.rows) {
+                const cantidadTotal = insumo.cantidad_usada * cantidad;
 
-                const insumosResult = await client.query(`
-                    SELECT insumo_id, cantidad AS cantidad_usada
-                    FROM producto_insumo
-                    WHERE producto_id = $1
-                `, [producto_id]);
+                if (Estado === "COMPLETADO") {
+                    // Convertir reserva en salida real
+                    await client.query(
+                        `UPDATE insumo
+                         SET cantidad_disponible = cantidad_disponible - $1,
+                             cantidad_reservada = cantidad_reservada - $1,
+                             fecha_actualizacion = NOW()
+                         WHERE id = $2`,
+                        [cantidadTotal, insumo.insumo_id]
+                    );
 
-                for (const insumo of insumosResult.rows) {
-                    const cantidadTotal = insumo.cantidad_usada * cantidad;
+                    await client.query(
+                        `INSERT INTO log_insumo (insumo_id, usuario_id, tipo_movimiento, cantidad, motivo)
+                         VALUES ($1, (SELECT usuario_id FROM pedido WHERE id = $2), 'SALIDA', $3, $4)`,
+                        [
+                            insumo.insumo_id,
+                            id,
+                            cantidadTotal,
+                            `Consumo real del pedido ${id}, producto ${producto_id}`
+                        ]
+                    );
 
-                    // Restar de disponible y de reservada
-                    await client.query(`
-                        UPDATE insumo
-                        SET cantidad_disponible = cantidad_disponible - $1,
-                            cantidad_reservada = cantidad_reservada - $1,
-                            fecha_actualizacion = NOW()
-                        WHERE id = $2
-                    `, [cantidadTotal, insumo.insumo_id]);
+                } else if (Estado === "CANCELADO") {
+                    // Liberar reserva
+                    await client.query(
+                        `UPDATE insumo
+                         SET cantidad_reservada = cantidad_reservada - $1,
+                             fecha_actualizacion = NOW()
+                         WHERE id = $2`,
+                        [cantidadTotal, insumo.insumo_id]
+                    );
 
-                    // Log de salida
-                    await client.query(`
-                        INSERT INTO log_insumo (insumo_id, usuario_id, tipo_movimiento, cantidad, motivo)
-                        VALUES ($1, (SELECT usuario_id FROM pedido WHERE id = $2), 'SALIDA', $3, $4)
-                    `, [
-                        insumo.insumo_id,
-                        id,
-                        cantidadTotal,
-                        `Consumo real del pedido ${id}, producto ${producto_id}`
-                    ]);
+                    await client.query(
+                        `INSERT INTO log_insumo (insumo_id, usuario_id, tipo_movimiento, cantidad, motivo)
+                         VALUES ($1, (SELECT usuario_id FROM pedido WHERE id = $2), 'AJUSTE', $3, $4)`,
+                        [
+                            insumo.insumo_id,
+                            id,
+                            cantidadTotal,
+                            `Reserva cancelada del pedido ${id}, producto ${producto_id}`
+                        ]
+                    );
                 }
             }
         }
 
-        // ⚡ En cancelado → factura
-        if (Estado.toUpperCase() === "CANCELADO") {
-            const existing = await client.query(
-                "SELECT * FROM factura WHERE pedido_id = $1",
-                [id]
-            );
-
+        // Factura solo en cancelado
+        if (Estado === "CANCELADO") {
+            const existing = await client.query("SELECT * FROM factura WHERE pedido_id = $1", [id]);
             if (existing.rows.length === 0) {
-                const totalResult = await client.query(`
-                    SELECT SUM(pd.cantidad * pr.precio_venta) AS total
-                    FROM pedido_detalle pd
-                    JOIN producto pr ON pr.id = pd.producto_id
-                    WHERE pd.pedido_id = $1
-                `, [id]);
+                const totalResult = await client.query(
+                    `SELECT SUM(pd.cantidad * pr.precio_venta) AS total
+                     FROM pedido_detalle pd
+                     JOIN producto pr ON pr.id = pd.producto_id
+                     WHERE pd.pedido_id = $1`,
+                    [id]
+                );
 
                 const total = totalResult.rows[0]?.total || 0;
 
-                await client.query(`
-                    INSERT INTO factura (pedido_id, total, metodo_pago, estado)
-                    VALUES ($1, $2, $3, $4)
-                `, [id, total, "EFECTIVO", "PAGO"]);
+                await client.query(
+                    `INSERT INTO factura (pedido_id, total, metodo_pago, estado)
+                     VALUES ($1, $2, $3, $4)`,
+                    [id, total, "EFECTIVO", "PAGO"]
+                );
             }
         }
 

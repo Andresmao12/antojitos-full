@@ -3,50 +3,52 @@ import styles from './AddPostreModal.module.css';
 import buttonStyles from '../../../../styles/buttons.module.css';
 import { useApi } from '../../../../hooks/useApi';
 import { SHEMA_DB } from '../../../../utils/constants';
-// import * as cloudinaryService from '../../../../services/cloudinary';
 
 const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
     const tableSchema = SHEMA_DB.tables.find(t => t.namedb?.toLowerCase() === 'producto');
-    const { namedb: tableName, columns } = tableSchema || {};
+    const { columns } = tableSchema || {};
 
     const { fetchAll, createItem, dataFrom } = useApi(tableSchema);
 
     // ESTADOS
     const [ingredientes, setIngredientes] = useState([]); // [{ insumoId, cantidad }]
-    const [capas, setCapas] = useState({}); // { capa1: { insumoId, cantidad }, ... }
+    const [capas, setCapas] = useState({}); // { capa1: { ingrediente, cantidad } }
     const [formData, setFormData] = useState({});
     const [imagePreview, setImagePreview] = useState(null);
 
-
-    // CARGA INICIAL DE INSUMOS Y TAMAÑOS
+    // CARGA INICIAL DE INSUMOS, TAMAÑOS Y PRODUCTOS (para plantillas)
     useEffect(() => {
         (async () => {
             try {
                 await fetchAll('insumo');
                 await fetchAll('tamanio');
+                await fetchAll('producto'); // para traer plantillas
             } catch (e) {
-                console.error('Error haceiendo los fetch', e);
+                console.error('Error haciendo los fetch', e);
             }
         })();
     }, []);
 
+    // Debug
     useEffect(() => {
-        console.log("ESTADO INGREDIENTES: ", ingredientes)
-        console.log("ESTADO CAPAS: ", capas)
-        console.log("FETCH INGREDIENTES: ", dataFrom['insumo'])
-        console.log("FETCH TAMANIOS: ", dataFrom['tamanio'])
+        console.log("ESTADO INGREDIENTES: ", ingredientes);
+        console.log("ESTADO CAPAS: ", capas);
+        console.log("FETCH INSUMOS: ", dataFrom['insumo']);
+        console.log("FETCH TAMANIOS: ", dataFrom['tamanio']);
+        console.log("FETCH PRODUCTOS: ", dataFrom['producto']);
     }, [ingredientes, capas, dataFrom]);
 
-
     const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        const { name, type, value, checked } = e.target;
+        setFormData({
+            ...formData,
+            [name]: type === 'checkbox' ? checked : value
+        });
     };
 
     // MANEJO DE LA IMAGEN
     const UploadImage = async (e) => {
         e.preventDefault();
-
         let file = null;
 
         try { file = e.dataTransfer.files?.[0]; }
@@ -74,31 +76,40 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
 
     const handleDragOver = (e) => e.preventDefault();
 
-
     // INGREDIENTES
     const handleIngredienteSubmit = (e) => {
         e.preventDefault();
         const ingrediente = formData['ingrediente'];
-        console.log("INGREDIENTE SELECCIONADO: ", ingrediente)
         const cantidad = formData["ingrediente-cantidad"];
         if (!ingrediente || !cantidad) return;
 
-        console.log('FORMDATA INGREDIENTE: ', formData)
-        const nuevo = { "insumoId": ingrediente, cantidad };
+        const nuevo = { insumoId: ingrediente, cantidad };
         setIngredientes([...ingredientes, nuevo]);
     };
 
-    // CAPAS
+    // CAPAS NORMALES
     const handleCapaSubmit = (e) => {
         e.preventDefault();
         const ingrediente = formData['capa'];
         const cantidad = formData["capa-cantidad"];
         if (!ingrediente || !cantidad) return;
+
         const capaCount = Object.keys(capas).length;
         const nuevaClave = `capa${capaCount + 1}`;
         const nuevaCapa = {
             ...capas,
             [nuevaClave]: { ingrediente, cantidad },
+        };
+        setCapas(nuevaCapa);
+    };
+
+    // CAPA VACÍA
+    const handleCapaVaciaSubmit = () => {
+        const capaCount = Object.keys(capas).length;
+        const nuevaClave = `capa${capaCount + 1}`;
+        const nuevaCapa = {
+            ...capas,
+            [nuevaClave]: { ingrediente: null, cantidad: null },
         };
         setCapas(nuevaCapa);
     };
@@ -125,7 +136,7 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
         }
     };
 
-    const excludedNamedb = ['id', 'url_imagen', 'fecha_creacion', 'datos_proceso', 'plantilla_id', 'tamanio_id'];
+    const excludedNamedb = ['id', 'url_imagen', 'fecha_creacion', 'datos_proceso', 'plantilla_id', 'tamanio_id', 'es_plantilla'];
 
     return (
         <div className={styles.modalOverlay}>
@@ -177,7 +188,46 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                             ))}
                         </select>
                     </div>
+
+                    <div className={styles.checkboxWrapper}>
+                        <label className={styles.switchLabel}>
+                            ¿Es plantilla?
+                            <input
+                                type="checkbox"
+                                name="es_plantilla"
+                                checked={formData.es_plantilla || false}
+                                onChange={handleChange}
+                                className={styles.switchInput}
+                            />
+                            <span className={styles.slider}></span>
+                        </label>
+                    </div>
                 </div>
+
+
+
+
+                {/* Selección de plantilla si no es plantilla */}
+                {formData.es_plantilla && (
+                    <>
+                        <h3>Plantilla</h3>
+                        <select
+                            name="plantilla_id"
+                            onChange={handleChange}
+                            value={formData.plantilla_id || ''}
+                            className={styles.select}
+                        >
+                            <option value="">Sin plantilla</option>
+                            {dataFrom['producto']
+                                ?.filter((p) => p.es_plantilla)
+                                .map((plantilla) => (
+                                    <option key={plantilla.id} value={plantilla.id}>
+                                        {plantilla.nombre}
+                                    </option>
+                                ))}
+                        </select>
+                    </>
+                )}
 
                 {/* Imagen */}
                 <div className={styles.imageDropZone} onDrop={UploadImage} onDragOver={handleDragOver}>
@@ -231,14 +281,13 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                             id={`inp-capa`}
                             className={styles.select}
                             name={`capa`}
-                            required
                             onChange={handleChange}
                             value={formData[`capa`] || ''}
                         >
                             <option>Seleccione...</option>
-                            {ingredientes.map((insumo, idx) => {
-                                return <option key={idx}> {dataFrom['insumo'].find(e => e.id == insumo.insumoId)?.nombre}</option>
-                            })}
+                            {ingredientes.map((insumo, idx) => (
+                                <option key={idx}> {dataFrom['insumo'].find(e => e.id == insumo.insumoId)?.nombre}</option>
+                            ))}
                         </select>
                     </div>
                     <div className={styles.inpCont}>
@@ -247,7 +296,6 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                             name='capa-cantidad'
                             type='number'
                             placeholder=" "
-                            required
                             onChange={handleChange}
                             value={formData['capa-cantidad'] || ''}
                         />
@@ -259,18 +307,24 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                         className={`${buttonStyles.addButton} ${styles.addButton}`}
                         onClick={handleCapaSubmit}
                     />
+                    {formData.es_plantilla && <input
+                        type="button"
+                        value="+ Capa vacía"
+                        className={`${buttonStyles.addButton} ${styles.emptyLayerButton}`}
+                        onClick={handleCapaVaciaSubmit}
+                    />}
                 </div>
 
                 <div className={styles.ingredientesCont}>
                     {Object.entries(capas).map(([_, value], idx) => (
                         <div key={idx} className={styles.ingredienteCont}>
-                            <span>{value.ingrediente}</span>
-                            <span>{value.cantidad}g</span>
+                            <span>{value.ingrediente ? value.ingrediente : '🔲 (Capa vacía)'}</span>
+                            <span>{value.cantidad ? `${value.cantidad}g` : ''}</span>
                         </div>
                     ))}
                 </div>
 
-                <button className={buttonStyles.searchButton} type="submit">Guardar DatosProceso</button>
+                <button className={buttonStyles.searchButton} type="submit">Guardar</button>
             </form>
         </div>
     );

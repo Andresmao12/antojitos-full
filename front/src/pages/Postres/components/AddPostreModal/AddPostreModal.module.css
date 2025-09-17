@@ -178,11 +178,73 @@
 
 
 .addButton {
-
     height: 80%;
     font-size: 25px;
 
 }
+
+
+.checkboxWrapper {
+    align-self: center;
+    margin-left: 50px;
+    grid-column: span 2;
+}
+
+.switchLabel {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    user-select: none;
+    position: relative;
+}
+
+.switchInput {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 22px;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: background-color 0.3s;
+}
+
+
+.slider::before {
+    content: "";
+    position: absolute;
+    height: 18px;
+    width: 18px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.switchInput:checked+.slider {
+    background-color: #4caf50;
+}
+
+.switchInput:checked+.slider::before {
+    transform: translateX(20px);
+}
+
+
+.emptyLayerButton {
+    width: 100%;
+    padding: 5px 0;
+    font-size: 16px;
+    grid-column: span 2;
+}
+
 
 .ingredienteCont {
     width: 100%;
@@ -255,28 +317,28 @@
 }
 
 .imageDropZone {
-  border: 2px dashed #bbb;
-  border-radius: 12px;
-  padding: 1rem;
-  text-align: center;
-  background-color: #f9f9f9;
-  margin-bottom: 1rem;
-  transition: background-color 0.2s ease;
-  cursor: pointer;
+    border: 2px dashed #bbb;
+    border-radius: 12px;
+    padding: 1rem;
+    text-align: center;
+    background-color: #f9f9f9;
+    margin-bottom: 1rem;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
 }
 
 .imageDropZone:hover {
-  background-color: #f1f1f1;
+    background-color: #f1f1f1;
 }
 
 .imageDropZone input[type="file"] {
-  margin-top: 0.5rem;
+    margin-top: 0.5rem;
 }
 
 .imagePreview {
-  margin-top: 1rem;
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

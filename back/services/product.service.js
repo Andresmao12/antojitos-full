@@ -2,7 +2,7 @@ import { pool } from "../database/db.js";
 
 export const getAllProducts = async () => {
     try {
-        const query = 'SELECT * FROM producto';
+        const query = 'SELECT * FROM producto WHERE es_plantilla = false';
         console.log(`----> EJECUTANDO QUERY: "${query}"`);
 
         const result = await pool.query(query);
@@ -22,7 +22,7 @@ export const getProductById = async (id) => {
         console.log(`----> EJECUTANDO QUERY: "${query}"`);
 
         const result = await pool.query(query, [id]);
-        return result.rows;
+        return result.rows[0];
 
     } catch (error) {
         console.error('-- Error al obtener producto:', error);
@@ -38,7 +38,7 @@ export const createProduct = async (data) => {
         tamanio_id,
         datos_proceso,
         precio_venta,
-        plantilla_id = null,
+        es_plantilla = false,
         insumos = []
     } = data;
 
@@ -49,14 +49,14 @@ export const createProduct = async (data) => {
         await client.query('BEGIN');
 
         const queryProducto = `
-            INSERT INTO producto (nombre, url_imagen, descripcion, precio_venta, datos_proceso, tamanio_id, plantilla_id)
+            INSERT INTO producto (nombre, url_imagen, descripcion, precio_venta, datos_proceso, tamanio_id, es_plantilla)
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             RETURNING id
         `;
         console.log(`----> EJECUTANDO QUERY Producto: "${queryProducto}"`);
 
         const resultProd = await client.query(queryProducto, [
-            nombre, url_imagen, descripcion, precio_venta, datos_proceso, tamanio_id,  plantilla_id
+            nombre, url_imagen, descripcion, precio_venta, datos_proceso, tamanio_id,  es_plantilla
         ]);
 
         const productoId = resultProd.rows[0].id;
@@ -96,7 +96,7 @@ export const updateProduct = async (id, data) => {
     try {
         const query = `
       UPDATE producto
-      SET nombre = $1, urlimagen = $2, descripcion = $3, precioVenta = $4, datosProceso = $5, tamanioid = $6, plantillaid = $7
+      SET nombre = $1, url_imagen = $2, descripcion = $3, precio_venta = $4, datos_proceso = $5, tamanio_id = $6, plantilla_id = $7
       WHERE id = $8
       RETURNING *
     `;

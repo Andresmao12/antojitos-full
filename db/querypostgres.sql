@@ -8,7 +8,7 @@ create type estado_postre_enum as enum ('PENDIENTE', 'EN_PROCESO', 'PREPARADO', 
 create type estado_factura_enum as enum ('PENDIENTE', 'PAGO', 'ANULADO');
 create type estado_pedido_enum as enum ('PENDIENTE', 'EN_PROCESO', 'COMPLETADO', 'CANCELADO');
 create type metodo_pago_enum as enum ('EFECTIVO', 'TARJETA', 'TRANSFERENCIA');
-create type tipo_movimiento_enum as enum ('ENTRADA', 'SALIDA', 'AJUSTE');
+create type tipo_movimiento_enum as enum ('ENTRADA', 'SALIDA','RESERVA', 'AJUSTE');
 
 --> creacion de tablas <--
 create table rol (
@@ -50,13 +50,6 @@ create table insumo (
     fecha_actualizacion timestamp default current_timestamp
 );
 
-create table plantilla (
-    id serial primary key,
-    tamanio_id int not null references tamanio(id),
-    nombre varchar(100) not null,
-    descripcion text,
-    fecha_creacion timestamp default current_timestamp
-);
 
 create table producto (
     id serial primary key,
@@ -64,10 +57,10 @@ create table producto (
     descripcion text,
     url_imagen varchar(255),
     tamanio_id int references tamanio(id),
-    datos_proceso text,
+    datos_proceso jsonb,
     precio_venta numeric(10,2),
     fecha_creacion timestamp default current_timestamp,
-    plantilla_id int references plantilla(id)
+    es_plantilla boolean default false
 );
 
 create table producto_insumo (
@@ -131,7 +124,6 @@ create index idx_usuario_rol on usuario(rol_id);
 
 -- producto → tamanio y plantilla
 create index idx_producto_tamanio on producto(tamanio_id);
-create index idx_producto_plantilla on producto(plantilla_id);
 
 -- producto_insumo → producto e insumo
 create index idx_producto_insumo_producto on producto_insumo(producto_id);
