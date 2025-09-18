@@ -94,7 +94,7 @@ const AddPedidoModal = ({ handleShowCreate, handleRefresh }) => {
                             value={formData.producto || ''}
                         >
                             <option>Seleccione producto...</option>
-                            {dataFrom["Producto"]?.map((producto) => (
+                            {dataFrom["Producto"]?.filter((producto) => !producto.es_plantilla)?.map((producto) => (
                                 <option key={producto.id} value={producto.id}>
                                     {console.log(producto)}
                                     {`${producto.nombre} ${dataFrom["Tamanio"]?.find(t => t.id === producto.tamanio_id)?.nombre} ➜ $${producto.precio_venta}`}

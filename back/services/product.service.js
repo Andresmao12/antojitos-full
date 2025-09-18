@@ -2,7 +2,7 @@ import { pool } from "../database/db.js";
 
 export const getAllProducts = async () => {
     try {
-        const query = 'SELECT * FROM producto WHERE es_plantilla = false';
+        const query = 'SELECT * FROM producto';
         console.log(`----> EJECUTANDO QUERY: "${query}"`);
 
         const result = await pool.query(query);

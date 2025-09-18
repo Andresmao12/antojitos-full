@@ -18,6 +18,8 @@ const Sidebar = () => {
                         if (element.showInSlider) return <NavLink to={`/${element.name?.toLowerCase()}`} key={i} className={styles.link}>{element.name}</NavLink>
                     })
                 }
+                <NavLink to={`/Plantillas`} className={styles.link}>Plantillas</NavLink>
+
             </nav>
             <footer className={styles.footer}>
                 antojitos ©

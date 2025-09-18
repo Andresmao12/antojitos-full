@@ -2,14 +2,14 @@ import { pool } from "../database/db.js";
 
 export const getDashboardData = async () => {
   try {
-    console.log("Ejecutando query A...");
+    // A. Pedidos por estado
     const estados = await pool.query(`
       SELECT estado, COUNT(*) AS total
       FROM pedido
       GROUP BY estado
     `);
 
-    console.log("Ejecutando query B...");
+    // B. Postres pendientes (por nombre y tamaño)
     const postresPendientes = await pool.query(`
       SELECT pr.nombre, pr.tamanio_id AS tamanioid, SUM(pd.cantidad) AS cantidadtotal
       FROM pedido p
@@ -19,20 +19,21 @@ export const getDashboardData = async () => {
       GROUP BY pr.nombre, pr.tamanio_id
     `);
 
-    console.log("Ejecutando query C...");
+    // C. Ingresos
     const ingresos = await pool.query(`
-      SELECT SUM(total) AS totalingresos FROM factura
+      SELECT COALESCE(SUM(total), 0) AS totalingresos 
+      FROM factura
     `);
 
-    console.log("Ejecutando query D...");
+    // D. Egresos
     const egresos = await pool.query(`
-      SELECT SUM(li.cantidad * COALESCE(i.precio_gramo, 0)) AS totalegresos
+      SELECT COALESCE(SUM(li.cantidad * COALESCE(i.precio_gramo, 0)), 0) AS totalegresos
       FROM log_insumo li
       JOIN insumo i ON li.insumo_id = i.id
       WHERE li.tipo_movimiento = 'SALIDA'
     `);
 
-    console.log("Ejecutando query E...");
+    // E. Insumos requeridos (pendientes)
     const insumosPendientesResult = await pool.query(`
       SELECT pi.insumo_id AS insumoid, SUM(pd.cantidad * pi.cantidad) AS cantidadtotal
       FROM pedido p
@@ -43,13 +44,10 @@ export const getDashboardData = async () => {
     `);
     const insumosPendientes = insumosPendientesResult.rows;
 
-    console.log("Consultando insumos compuestos...");
-    const insumosCompuestosResult = await pool.query(`
-      SELECT id FROM insumo WHERE compuesto = true
-    `);
+    // E1. Expandir insumos compuestos
+    const insumosCompuestosResult = await pool.query(`SELECT id FROM insumo WHERE compuesto = true`);
     const idsCompuestos = insumosCompuestosResult.rows.map(row => row.id);
 
-    console.log("Consultando composiciones...");
     const composicionesResult = await pool.query(`
       SELECT 
         insumo_compuesto_id AS insumocompuestoid, 
@@ -60,10 +58,8 @@ export const getDashboardData = async () => {
     const composiciones = composicionesResult.rows;
 
     let insumosExpandidos = [];
-
     for (const insumo of insumosPendientes) {
       const { insumoid, cantidadtotal } = insumo;
-
       if (idsCompuestos.includes(insumoid)) {
         const componentes = composiciones.filter(c => c.insumocompuestoid === insumoid);
         for (const comp of componentes) {
@@ -87,14 +83,47 @@ export const getDashboardData = async () => {
       return acc;
     }, []);
 
-    console.log("Enviando respuesta del dashboard...");
+    // F. Top postres más vendidos
+    const topPostres = await pool.query(`
+      SELECT pr.nombre, COUNT(*) AS total_vendidos
+      FROM pedido_detalle pd
+      JOIN producto pr ON pr.id = pd.producto_id
+      GROUP BY pr.nombre
+      ORDER BY total_vendidos DESC
+      LIMIT 5
+    `);
+
+    // G. Ventas por día (últimos 30 días)
+    const ventasPorDia = await pool.query(`
+      SELECT DATE(f.fecha) AS dia, SUM(f.total) AS total_dia
+      FROM factura f
+      WHERE f.fecha >= NOW() - INTERVAL '30 days'
+      GROUP BY DATE(f.fecha)
+      ORDER BY dia ASC
+    `);
+
+    // H. Calcular utilidad
+    const utilidad = (Number(ingresos.rows[0]?.totalingresos) || 0) - (Number(egresos.rows[0]?.totalegresos) || 0);
+
+    // I. Alertas básicas
+    const alertas = [];
+    if (utilidad < 0) {
+      alertas.push({ tipo: "flujo_caja", mensaje: "⚠️ Los egresos superan a los ingresos en el periodo." });
+    }
+    if (insumosRequeridosFinal.length > 0) {
+      alertas.push({ tipo: "produccion", mensaje: "📦 Hay insumos requeridos pendientes de compra." });
+    }
 
     return {
       pedidosPorEstado: estados.rows,
       postresPendientes: postresPendientes.rows,
       ingresos: ingresos.rows[0]?.totalingresos || 0,
       egresos: egresos.rows[0]?.totalegresos || 0,
+      utilidad,
       insumosRequeridos: insumosRequeridosFinal,
+      topPostres: topPostres.rows,
+      ventasPorDia: ventasPorDia.rows,
+      alertas
     };
 
   } catch (error) {

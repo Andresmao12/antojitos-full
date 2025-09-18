@@ -46,6 +46,16 @@ const Postres = () => {
 
     console.log(' DATA DESDE POSTRES: ', data)
 
+    const [productos, setProductos] = useState([]);
+
+    useEffect(() => {
+        if (Array.isArray(data)) {
+            setProductos(data.filter((p) => !p.es_plantilla));
+        } else {
+            setProductos([]);
+        }
+    }, [data]);
+
     return (<>
 
         <div className={styles.searchAddCont}>
@@ -56,14 +66,13 @@ const Postres = () => {
         {/* {showCreate && <DynamicForm tableShema={tableShema} regiterData={formData} showCreate={handleShowCreate} />} */}
         {showCreate && <AddPostreModal handleShowModal={handleShowCreate} handleRefresh={handleRefresh} />}
 
-        {(!data || data?.length == 0) ?
+        {(!productos || productos?.length == 0) ?
             <span className={styles.msgWithoutData}>Por aca no hay informacion</span>
             :
             <div className={styles.cardCont}>
-                {Array.isArray(data) &&
-                    data.map((element, i) =>
-                        <PostreCard key={i} id={element.id} title={element.nombre} desc={element.descripcion} img={element.url_imagen} tamanio={element.tamanio_id} tableShema={tableShema} />
-                    )}
+                {productos.map((element, i) =>
+                    <PostreCard key={i} id={element.id} title={element.nombre} desc={element.descripcion} img={element.url_imagen} tamanio={element.tamanio_id} tableShema={tableShema} />
+                )}
             </div>}
     </>
     )

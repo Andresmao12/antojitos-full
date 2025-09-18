@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import styles from './AddPostreModal.module.css';
+import styles from './AddPlantillaModal.module.css';
 import buttonStyles from '../../../../styles/buttons.module.css';
 import { useApi } from '../../../../hooks/useApi';
 import { SHEMA_DB } from '../../../../utils/constants';
 
-const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
+const AddPlantillaModal = ({ handleShowModal, handleRefresh }) => {
     const tableSchema = SHEMA_DB.tables.find(t => t.namedb?.toLowerCase() === 'producto');
     const { columns } = tableSchema || {};
 
@@ -13,75 +13,20 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
     // ESTADOS
     const [ingredientes, setIngredientes] = useState([]); // [{ insumoId, cantidad }]
     const [capas, setCapas] = useState({}); // { capa1: { ingrediente, cantidad } }
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState({ es_plantilla: true }); // 👈 Siempre true
     const [imagePreview, setImagePreview] = useState(null);
 
-    // CARGA INICIAL DE INSUMOS, TAMAÑOS Y PRODUCTOS (para plantillas)
+    // CARGA INICIAL
     useEffect(() => {
         (async () => {
             try {
                 await fetchAll('insumo');
                 await fetchAll('tamanio');
-                await fetchAll('producto_insumo')
-                await fetchAll('producto');
             } catch (e) {
                 console.error('Error haciendo los fetch', e);
             }
         })();
     }, []);
-
-    // Cargar datos desde plantilla seleccionada
-    useEffect(() => {
-        if (!formData.plantilla_id || !Array.isArray(dataFrom['producto'])) return;
-
-        const plantilla = dataFrom['producto'].find(p => p.id == formData.plantilla_id);
-        if (!plantilla) return;
-
-
-        console.log("Cargando plantilla: ", plantilla);
-
-        try {
-            setFormData((prev) => ({
-                ...prev,
-                nombre: plantilla.nombre,
-                descripcion: plantilla.descripcion,
-                precio_venta: plantilla.precio_venta,
-                tamanio_id: plantilla.tamanio_id,
-                url_imagen: plantilla.url_imagen,
-                es_plantilla: false
-            }));
-
-            console.log('DATOS TRAIDOS DE PRODUCTO INSUMO: ', dataFrom['producto_insumo']);
-            console.log('DATOS TRAIDOS DE PRODUCTO: ', dataFrom['producto']);
-
-            // ✅ Ingredientes
-
-            let new_ingredientes = dataFrom['producto_insumo'].filter(pi => pi.producto_id == plantilla.id)
-            console.log('INGREDIENTES DESPUES DEL FILTER: ', ingredientes)
-
-            if (new_ingredientes.length != 0) {
-                new_ingredientes = new_ingredientes.map(pi => ({ insumoId: pi.insumo_id, cantidad: pi.cantidad }));
-                console.log('INGREDIENTES DESPUES DEL MAP: ', new_ingredientes)
-
-                setIngredientes(new_ingredientes);
-            }
-
-
-            // ✅ Capas
-            if (plantilla.datos_proceso && plantilla.datos_proceso.capas) {
-                const capas = plantilla.datos_proceso.capas;
-                setCapas(capas);
-
-            }
-
-            // // ✅ Imagen preview
-            // if (plantilla.url_imagen) {
-            //     setImagePreview(plantilla.url_imagen);
-            // }
-        } catch (err) {
-            console.error("Error cargando plantilla: ", err);
-        }
-    }, [formData.plantilla_id, dataFrom['producto']]);
 
     const handleChange = (e) => {
         const { name, type, value, checked } = e.target;
@@ -164,6 +109,7 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
         try {
             const dataToSend = {
                 ...formData,
+                es_plantilla: true, // 👈 obligatorio
                 insumos: ingredientes,
                 datos_proceso: JSON.stringify({ capas }),
             };
@@ -177,11 +123,11 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
             await handleRefresh?.();
             handleShowModal();
         } catch (err) {
-            console.error('Error creando producto', err);
+            console.error('Error creando plantilla', err);
         }
     };
 
-    const excludedNamedb = ['id', 'url_imagen', 'fecha_creacion', 'datos_proceso', 'plantilla_id', 'tamanio_id', 'es_plantilla'];
+    const excludedNamedb = ['id', 'url_imagen', 'fecha_creacion', 'datos_proceso', 'plantilla_id', 'es_plantilla'];
 
     return (
         <div className={styles.modalOverlay}>
@@ -190,7 +136,7 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
             </button>
 
             <form className={styles.formCont} onSubmit={handleSubmit}>
-                <h2>Añadir postre</h2>
+                <h2>Añadir plantilla</h2>
 
                 {/* Inputs schema */}
                 {Array.isArray(columns) && columns.map(col => {
@@ -213,7 +159,7 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                     );
                 })}
 
-                {/* Tamaño + es plantilla */}
+                {/* Tamaño */}
                 <h3>Tamaño</h3>
                 <div className={styles.inpGroup}>
                     <div className={styles.selectCont}>
@@ -233,28 +179,6 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                         </select>
                     </div>
                 </div>
-
-                {/* Selección de plantilla */}
-
-                <>
-                    <h3>Plantilla</h3>
-                    <select
-                        name="plantilla_id"
-                        onChange={handleChange}
-                        value={formData.plantilla_id || ''}
-                        className={styles.select}
-                    >
-                        <option value="">Sin plantilla</option>
-                        {dataFrom['producto']
-                            ?.filter((p) => p.es_plantilla)
-                            .map((plantilla) => (
-                                <option key={plantilla.id} value={plantilla.id}>
-                                    {plantilla.nombre}
-                                </option>
-                            ))}
-                    </select>
-                </>
-
 
                 {/* Imagen */}
                 <div className={styles.imageDropZone} onDrop={UploadImage} onDragOver={handleDragOver}>
@@ -284,23 +208,11 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                     </div>
 
                     <div className={styles.inpCont}>
-                        <input
-                            id="inp-ingrediente-cantidad"
-                            name="ingrediente-cantidad"
-                            type="number"
-                            placeholder=" "
-                            onChange={handleChange}
-                            value={formData['ingrediente-cantidad'] ?? ''}
-                        />
+                        <input id="inp-ingrediente-cantidad" name="ingrediente-cantidad" type="number" placeholder=" " onChange={handleChange} value={formData['ingrediente-cantidad'] ?? ''} />
                         <label htmlFor="inp-ingrediente-cantidad">Cantidad</label>
                     </div>
 
-                    <input
-                        type="button"
-                        value="+"
-                        className={`${buttonStyles.addButton} ${styles.addButton}`}
-                        onClick={handleIngredienteSubmit}
-                    />
+                    <input type="button" value="+" className={`${buttonStyles.addButton} ${styles.addButton}`} onClick={handleIngredienteSubmit} />
                 </div>
 
                 <div className={styles.ingredientesCont}>
@@ -345,61 +257,32 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
                         className={`${buttonStyles.addButton} ${styles.addButton}`}
                         onClick={handleCapaSubmit}
                     />
+                    <input
+                        type="button"
+                        value="+ Capa vacía"
+                        className={`${buttonStyles.addButton} ${styles.emptyLayerButton}`}
+                        onClick={handleCapaVaciaSubmit}
+                    />
                 </div>
 
                 <div className={styles.ingredientesCont}>
                     {Object.entries(capas).map(([key, value], idx) => {
                         const insumo = dataFrom['insumo']?.find(e => e.id == value.ingrediente);
-
                         return (
                             <div key={idx} className={styles.ingredienteCont}>
-                                {insumo ? (
-                                    <>
-                                        <span>{insumo.nombre}</span>
-                                        <span>{value.cantidad ? `${value.cantidad}g` : ''}</span>
-                                    </>
-                                ) :
-                                    <> <select
-                                        className={styles.select}
-                                        value={value.ingrediente || ""}
-                                        onChange={(e) =>
-                                            setCapas({
-                                                ...capas,
-                                                [key]: { ...value, ingrediente: parseInt(e.target.value) }
-                                            })
-                                        }
-                                    >
-                                        <option value="">Seleccione insumo...</option>
-                                        {ingredientes.map((insumo) => (
-                                            <option key={insumo.insumoId} value={insumo.insumoId}>
-                                                {dataFrom['insumo'].find(e => e.id == insumo.insumoId)?.nombre}
-                                            </option>
-                                        ))}
-                                    </select>
-
-                                        <input
-                                            type="number"
-                                            placeholder="Cantidad"
-                                            className={styles.capaInput}
-                                            value={value.cantidad || ""}
-                                            onChange={(e) =>
-                                                setCapas({
-                                                    ...capas,
-                                                    [key]: { ...value, cantidad: e.target.value }
-                                                })
-                                            }
-                                        />
-                                    </>
-                                }
+                                <span>
+                                    {insumo ? insumo.nombre : '🔲 (Capa vacía)'}
+                                </span>
+                                <span>{value.cantidad ? `${value.cantidad}g` : ''}</span>
                             </div>
                         );
                     })}
                 </div>
 
-                <button className={buttonStyles.searchButton} type="submit">Guardar</button>
+                <button className={buttonStyles.searchButton} type="submit">Guardar plantilla</button>
             </form>
         </div>
     );
 };
 
-export default AddPostreModal;
+export default AddPlantillaModal;
