@@ -4,6 +4,19 @@ import { useApi } from "../../hooks/useApi";
 import { SHEMA_DB } from "../../utils/constants";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 
+// PENDIENTES: 
+// REVISAR LA CREACION DE POSTRES Y PLANTILLAS
+// ARREGLAR DASHBOARD (NO SE MUESTRA CORRECTAMENTE O NO SE REALIZAN OPERACIONES AL CREAR PEDIDOS)
+// 
+/* Este dashboard no utiliza IA actualmente. Sin embargo, podrías usar IA para: 
+- Predecir demanda de insumos/postres. 
+- Detectar anomalías en ingresos/egresos. 
+- Recomendar compras de insumos. 
+- Analizar patrones de pedidos. 
+- Automatizar respuestas a clientes. 
+- Generar reportes inteligentes. */
+
+
 const Dashboard = () => {
     const [data, setData] = useState(null);
     const [checkedPostres, setCheckedPostres] = useState(() => {
@@ -17,21 +30,22 @@ const Dashboard = () => {
     const { fetchAll, dataFrom } = useApi(tableShema);
 
     useEffect(() => {
-        const fetchDashboard = async () => {
+        (async () => {
             try {
-                const res = await fetch("http://localhost:4000/api/dashboard");
-                const result = await res.json();
-                setData(result);
-                fetchAll("Insumo");
+                fetchAll("dashboard");
+                fetchAll("insumo");
             } catch (error) {
                 console.error("Error cargando dashboard:", error);
             }
-        };
+        })()
 
-        fetchDashboard();
     }, []);
 
-    if (!data) return <div>Cargando dashboard...</div>;
+    useEffect(() => {
+        console.log("Data del 1dashboard:", dataFrom["dashboard"]);
+    }, [dataFrom]);
+
+    if (!dataFrom['dashboard']) return <div>Cargando dashboard...</div>;
 
     const {
         pedidosPorEstado = [],

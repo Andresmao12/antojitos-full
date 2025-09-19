@@ -165,7 +165,7 @@ const AddPostreModal = ({ handleShowModal, handleRefresh }) => {
             const dataToSend = {
                 ...formData,
                 insumos: ingredientes,
-                datos_proceso: JSON.stringify({ capas }),
+                datos_proceso: { capas },
             };
 
             delete dataToSend.ingrediente;

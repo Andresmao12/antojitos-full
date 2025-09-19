@@ -9,9 +9,9 @@ export const SHEMA_DB = {
                 { name: "Correo Electrónico", namedb: "correo", type: "string", required: true },
                 { name: "Celular", namedb: "celular", type: "string" },
                 { name: "Dirección", namedb: "direccion", type: "string" },
-                { name: "Estado", namedb: "estado", type: "boolean", valueDefault: true },
+                { name: "Estado", namedb: "estado", type: "boolean", valueDefault: true, readonly: true },
                 { name: "Fecha Registro", namedb: "fecha_registro", type: "date", readonly: true },
-                { name: "Rol", namedb: "rol_id", type: "number", required: true }
+                { name: "Rol", namedb: "rol_id", type: "number", required: true, readonly: true }
             ],
             relations: [{ name: "Rol", fk: "rol_id" }],
             showInSlider: true

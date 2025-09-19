@@ -18,30 +18,24 @@ const PostreView = () => {
     // -----> SHEMAS <-----
     const tableSchema = SHEMA_DB.tables.find(element => element.namedb?.toLowerCase() === 'producto')
 
-    const { dataFrom, item, fetchAll, fetchById, updateItem } = useApi(tableSchema)
+    const { fetchAll, fetchById, dataFrom, item, updateItem } = useApi(tableSchema)
 
-    const [DataProceso, setDataProceso] = useState('')
+    const [DataProceso, setDataProceso] = useState({})
     const [showModalEdit, setShowModalEdit] = useState(false)
 
     useEffect(() => {
-        const firstCall = async () => {
+        (async () => {
             await fetchById(id)
             await fetchAll('insumo')
             await fetchAll('tamanio')
             await fetchAll("producto_insumo")
-        }
-        firstCall()
+        })()
     }, [])
 
-
     useEffect(() => {
-
-        if (item && item.datos_proceso) {
-            const itemParse = JSON.parse(item.datos_proceso);
-            setDataProceso(itemParse)
-            console.log("-----> DATOS PROCESO DESPUESS DE  PASEAR: ", itemParse)
-        }
-    }, [Object.keys(dataFrom).length])
+        console.log('ITEM DESDE POSTREVIEW: ', item)
+        if (item?.datos_proceso) setDataProceso(item?.datos_proceso)
+    }, [item])
 
 
     const handleShowModalEdit = () => {
@@ -115,11 +109,14 @@ const PostreView = () => {
                             <p>No hay capas definidas.</p>
                         ) : (
                             <div className={styles.capasContainer}>
-                                {Object.entries(DataProceso.capas).map(([nombreCapa, info], idx) => (
-                                    <div key={idx} className={styles.capaItem}>
-                                        <strong>{nombreCapa}:</strong> {info.ingrediente} - {info.cantidad}
+                                {Object.entries(DataProceso.capas).map((element, idx) => {
+                                    console.log("DATA PROCESO CAPAS", element)
+                                    const nameIngrediente = dataFrom["insumo"]?.find(i => i.id === ingrediente_id)?.nombre || 'Insumo desconocido'
+
+                                    return <div key={idx} className={styles.capaItem}>
+                                        <strong>{nameIngrediente}:</strong> {nameIngrediente} - {cantidad}
                                     </div>
-                                ))}
+                                })}
                             </div>
                         )}
                     </section>

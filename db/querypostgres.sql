@@ -68,7 +68,6 @@ create table producto_insumo (
     producto_id int not null references producto(id),
     insumo_id int not null references insumo(id),
     cantidad numeric(12,2) not null,
-    precio_unitario numeric(10,2) not null,
     fecha_registro timestamp default current_timestamp
 );
 

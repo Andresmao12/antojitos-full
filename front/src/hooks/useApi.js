@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { getAll, getAllFrom, getById, create, update, remove } from "../services/api"; 
+import { getAll, getAllFrom, getById, create, update, remove } from "../services/api";
 
 export const useApi = (tableSchema = false) => {
     const [data, setData] = useState(null);
@@ -33,10 +33,8 @@ export const useApi = (tableSchema = false) => {
         setLoading(true);
         setError(null);
         try {
-            console.log("SE EJECUTO USE API")
             const result = await getById(tableSchema, id);
-            console.log("RESULTS: ", result)
-            setItem(result[0]);
+            setItem(result);
         } catch (err) {
             setError(err.message || err.toString());
         } finally {

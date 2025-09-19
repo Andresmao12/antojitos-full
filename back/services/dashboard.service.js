@@ -95,10 +95,10 @@ export const getDashboardData = async () => {
 
     // G. Ventas por día (últimos 30 días)
     const ventasPorDia = await pool.query(`
-      SELECT DATE(f.fecha) AS dia, SUM(f.total) AS total_dia
+      SELECT DATE(f.fecha_factura) AS dia, SUM(f.total) AS total_dia
       FROM factura f
-      WHERE f.fecha >= NOW() - INTERVAL '30 days'
-      GROUP BY DATE(f.fecha)
+      WHERE f.fecha_factura >= NOW() - INTERVAL '30 days'
+      GROUP BY DATE(f.fecha_factura)
       ORDER BY dia ASC
     `);
 
@@ -134,3 +134,6 @@ export const getDashboardData = async () => {
     };
   }
 };
+
+
+GASTO: 272.750
