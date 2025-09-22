@@ -22,6 +22,7 @@ import productoInsumoRouter from './routes/product_Insumo.routes.js'
 import pedidoRouter from './routes/pedido.routes.js'
 import tamanioRouter from './routes/tamanio.routes.js'
 import dashboardRouter from './routes/dashboard.routes.js'
+import facturaRouter from './routes/factura.routes.js'
 
 app.use('/api/usuario', userRouter);
 app.use('/api/insumo', insumoRouter);
@@ -30,6 +31,8 @@ app.use('/api/producto_insumo', productoInsumoRouter);
 app.use('/api/pedido', pedidoRouter);
 app.use('/api/tamanio', tamanioRouter);
 app.use('/api/dashboard', dashboardRouter);
+app.use('/api/factura', facturaRouter);
+
 
 
 app.listen(PORT, () => {

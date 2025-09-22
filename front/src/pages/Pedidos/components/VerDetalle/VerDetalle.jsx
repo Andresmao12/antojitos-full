@@ -4,55 +4,94 @@ import buttonStyles from "../../../../styles/buttons.module.css";
 import { useApi } from "../../../../hooks/useApi";
 
 const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh }) => {
-    const { fetchById, item, updateItem } = useApi(tableSchema);
+    const { fetchById, item, updateItem, fetchAll, dataFrom } = useApi(tableSchema);
 
     const [pedido, setPedido] = useState(null);
-    const [estadoActual, setEstadoActual] = useState("");
-    const [estadoNuevo, setEstadoNuevo] = useState("");
     const [detalles, setDetalles] = useState([]);
+    const [factura, setFactura] = useState(null);
+
+    const [estadoPedido, setEstadoPedido] = useState("");
+    const [nuevoEstadoPedido, setNuevoEstadoPedido] = useState("");
+
+    const [estadoFactura, setEstadoFactura] = useState("");
+    const [nuevoEstadoFactura, setNuevoEstadoFactura] = useState("");
+    const [metodoPago, setMetodoPago] = useState("");
+
     const [loading, setLoading] = useState(false);
     const [mensaje, setMensaje] = useState("");
 
+    // Cargar pedido completo (pedido + detalles + factura)
     useEffect(() => {
         const fetchPedido = async () => {
             await fetchById(pedidoId);
+            await fetchAll("producto");
         };
         fetchPedido();
     }, [pedidoId]);
 
+    // Mapear datos al estado local
     useEffect(() => {
         if (item) {
-            console.log("Item recibido en detalle:", item);
-            setPedido(item.pedido);
-            setDetalles(item.detalles);
-            setEstadoActual(item.pedido?.estado || "PENDIENTE");
-            setEstadoNuevo(item.pedido?.estado || "PENDIENTE");
+            setPedido(item[0].pedido);
+            setDetalles(item[0].detalles);
+
+            setEstadoPedido(item[0].pedido?.estado || "PENDIENTE");
+            setNuevoEstadoPedido(item[0].pedido?.estado || "PENDIENTE");
+
+            if (item[0].factura) {
+                setFactura(item[0].factura);
+                setEstadoFactura(item[0].factura.estado);
+                setNuevoEstadoFactura(item[0].factura.estado);
+                setMetodoPago(item[0].factura.metodo_pago);
+            }
         }
     }, [item]);
 
-    const handleActualizarEstado = async () => {
+    // Guardar cambios unificados (pedido + factura)
+    const handleGuardarCambios = async () => {
         try {
             setLoading(true);
-            console.log("Actualizando estado: ", pedidoId, estadoNuevo);
-            await updateItem(pedidoId, { Estado: estadoNuevo });
-            setEstadoActual(estadoNuevo); // reflejar en front
+
+            // Actualizar pedido si cambió
+            if (nuevoEstadoPedido !== estadoPedido) {
+                await updateItem(pedidoId, { Estado: nuevoEstadoPedido });
+                setEstadoPedido(nuevoEstadoPedido);
+            }
+
+            // Actualizar factura si cambió
+            if (factura && (nuevoEstadoFactura !== estadoFactura || metodoPago !== factura.metodo_pago)) {
+                const res = await fetch(`${import.meta.env.VITE_API_ROUTE}/factura/${factura.id}`, {
+                    method: "PUT",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ metodo_pago: metodoPago, estado: nuevoEstadoFactura }),
+                });
+
+                if (!res.ok) throw new Error("Error al actualizar factura");
+
+                const data = await res.json();
+                setFactura(data);
+                setEstadoFactura(data.estado);
+                setNuevoEstadoFactura(data.estado);
+                setMetodoPago(data.metodo_pago);
+            }
+
+            setMensaje("✅ Cambios guardados correctamente");
             handleRefresh();
         } catch (err) {
-            console.error("Error al actualizar estado:", err);
-            setMensaje("❌ Error al guardar el estado");
+            console.error("Error al guardar cambios:", err);
+            setMensaje("❌ Error al guardar cambios");
         } finally {
             setLoading(false);
-            handleShowDetalle(null);
         }
     };
 
-    const handleCloseDetalle = () => {
-        handleShowDetalle(null);
-    };
+    const handleCloseDetalle = () => handleShowDetalle(null);
 
     if (!pedido) return <div className={styles.loading}>Cargando pedido...</div>;
 
-    const opciones = ["PENDIENTE", "EN_PROCESO", "COMPLETADO", "CANCELADO"];
+    const opcionesPedido = ["PENDIENTE", "EN_PROCESO", "COMPLETADO", "CANCELADO"];
+    const opcionesFactura = ["PENDIENTE", "PAGO", "ANULADO"];
+    const metodosPago = ["EFECTIVO", "TARJETA", "TRANSFERENCIA"];
 
     return (
         <div className={styles.modalOverlay}>
@@ -62,38 +101,27 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh
             >
                 <i className="fa-solid fa-xmark"></i>
             </button>
+
             <div className={styles.detalleCont}>
                 <div className={styles.titleBtnCont}>
                     <h2 className={styles.title}>Pedido #{pedido.id}</h2>
-                    <button
-                        onClick={handleActualizarEstado}
-                        className={styles.btn}
-                        disabled={loading || estadoNuevo === estadoActual}
-                    >
-                        {loading ? "Guardando..." : "Guardar cambios"}
-                    </button>
                 </div>
 
                 {mensaje && <p className={styles.feedbackMsg}>{mensaje}</p>}
 
                 <div className={styles.infoBox}>
-                    <p>
-                        <strong>Usuario:</strong> {pedido.nombreusuario}
-                    </p>
-                    <p>
-                        <strong>Fecha:</strong>{" "}
-                        {new Date(pedido.fecha_pedido).toLocaleString()}
-                    </p>
+                    <p><strong>Usuario:</strong> {pedido.nombreusuario}</p>
+                    <p><strong>Fecha:</strong> {new Date(pedido.fecha_pedido).toLocaleString()}</p>
 
                     <div className={styles.estadoSelector}>
-                        {opciones.map((opcion) => (
+                        {opcionesPedido.map((opcion) => (
                             <button
                                 key={opcion}
                                 className={`${styles.estadoBtn}
-                                    ${estadoActual === opcion ? styles.actual : ""}
-                                    ${estadoNuevo === opcion && estadoActual !== opcion ? styles.nuevo : ""}
+                                    ${estadoPedido === opcion ? styles.actual : ""}
+                                    ${nuevoEstadoPedido === opcion && estadoPedido !== opcion ? styles.nuevo : ""}
                                 `}
-                                onClick={() => setEstadoNuevo(opcion)}
+                                onClick={() => setNuevoEstadoPedido(opcion)}
                                 type="button"
                             >
                                 {opcion.replace("_", " ")}
@@ -105,12 +133,66 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh
                 <div className={styles.productosCont}>
                     <h3>Productos</h3>
                     <ul className={styles.listaProductos}>
-                        {detalles?.map((item) => (
-                            <li key={item.id} className={styles.productoItem}>
-                                {item.nombreproducto} x {item.cantidad}
-                            </li>
-                        ))}
+                        {detalles?.map((item) => {
+                            const productoInfo = dataFrom["producto"]?.find(p => p.id === item.producto_id);
+                            return (
+                                <li key={item.id} className={styles.productoItem}>
+                                    {(productoInfo?.nombre || item.nombreproducto) ?? "Producto desconocido"} x {item.cantidad}
+                                </li>
+                            );
+                        })}
                     </ul>
+                </div>
+
+                {factura && (
+                    <div className={styles.facturaCont}>
+                        <h3>Factura #{factura.id}</h3>
+                        <p><strong>Total:</strong> ${factura.total}</p>
+
+                        <div className={styles.formGroup}>
+                            <label>Método de Pago:</label>
+                            <div className={styles.selectCont}>
+                                <select
+                                    className={styles.select}
+                                    value={metodoPago}
+                                    onChange={(e) => setMetodoPago(e.target.value)}
+                                >
+                                    {metodosPago.map((m) => (
+                                        <option key={m} value={m}>{m}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className={styles.formGroup}>
+                            <label>Estado Factura:</label>
+                            <div className={styles.estadoSelector}>
+                                {opcionesFactura.map((opcion) => (
+                                    <button
+                                        key={opcion}
+                                        className={`${styles.estadoBtn}
+                                            ${estadoFactura === opcion ? styles.actual : ""}
+                                            ${nuevoEstadoFactura === opcion && estadoFactura !== opcion ? styles.nuevo : ""}
+                                        `}
+                                        onClick={() => setNuevoEstadoFactura(opcion)}
+                                        type="button"
+                                    >
+                                        {opcion}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                <div className={styles.actionsCont}>
+                    <button
+                        onClick={handleGuardarCambios}
+                        className={styles.btnSave}
+                        disabled={loading}
+                    >
+                        {loading ? "Guardando..." : "Guardar cambios"}
+                    </button>
                 </div>
             </div>
         </div>

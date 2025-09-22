@@ -166,3 +166,75 @@
     color: #10b981;
     font-weight: bold;
 }
+
+
+.alertSection {
+
+    padding: .8rem 0 .8rem .8em;
+    margin: 1em 0;
+    border-radius: 1rem;
+    background-color: rgb(255, 228, 118);
+}
+
+.cardRanking {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.cardRanking h3 {
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+    color: #1f2937;
+}
+
+.rankingList {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.rankingItem {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background-color: #f9fafb;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.rankingItem:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.rankNumber {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #6366f1;
+    width: 2rem;
+    text-align: center;
+}
+
+.rankingInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.postreName {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.postreVentas {
+    font-size: 0.85rem;
+    color: #6b7280;
+}

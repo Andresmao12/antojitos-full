@@ -153,3 +153,121 @@
     color: white;
     border-color: var(--secondary-color, #e09930);
 }
+
+
+/* ESTILOS SELECTS */
+.select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    width: 100%;
+    padding: 10px 40px 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 16px;
+
+    position: relative;
+
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.selectCont {
+    position: relative;
+}
+
+/* flechita personalizada */
+.selectCont::after {
+    content: "▼";
+
+    font-size: 10px;
+    color: #666;
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+.select:focus {
+    border-color: #7c3aed;
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    outline: none;
+}
+
+/* Caja general */
+.facturaCont,
+.infoBox,
+.productosCont {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Subgrupos con labels y select */
+.formGroup {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+label {
+    font-weight: 600;
+    color: #444;
+    font-size: 14px;
+}
+
+/* Botón guardar de cada bloque */
+.btnSave {
+    background-color: #7c3aed;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 15px;
+}
+
+.btnSave:hover:not(:disabled) {
+    background-color: #5b21b6;
+}
+
+.btnSave:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.actionsCont {
+    margin-top: 25px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btnSave {
+    background-color: #7c3aed;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btnSave:hover:not(:disabled) {
+    background-color: #5b21b6;
+}
+
+.btnSave:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}

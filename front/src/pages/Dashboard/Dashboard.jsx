@@ -4,19 +4,6 @@ import { useApi } from "../../hooks/useApi";
 import { SHEMA_DB } from "../../utils/constants";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 
-// PENDIENTES: 
-// REVISAR LA CREACION DE POSTRES Y PLANTILLAS
-// ARREGLAR DASHBOARD (NO SE MUESTRA CORRECTAMENTE O NO SE REALIZAN OPERACIONES AL CREAR PEDIDOS)
-// 
-/* Este dashboard no utiliza IA actualmente. Sin embargo, podrías usar IA para: 
-- Predecir demanda de insumos/postres. 
-- Detectar anomalías en ingresos/egresos. 
-- Recomendar compras de insumos. 
-- Analizar patrones de pedidos. 
-- Automatizar respuestas a clientes. 
-- Generar reportes inteligentes. */
-
-
 const Dashboard = () => {
     const [data, setData] = useState(null);
     const [checkedPostres, setCheckedPostres] = useState(() => {
@@ -29,6 +16,7 @@ const Dashboard = () => {
     );
     const { fetchAll, dataFrom } = useApi(tableShema);
 
+    // Cargar datos iniciales
     useEffect(() => {
         (async () => {
             try {
@@ -37,15 +25,17 @@ const Dashboard = () => {
             } catch (error) {
                 console.error("Error cargando dashboard:", error);
             }
-        })()
-
+        })();
     }, []);
 
+    // Sincronizar estado "data" con dataFrom["dashboard"]
     useEffect(() => {
-        console.log("Data del 1dashboard:", dataFrom["dashboard"]);
+        if (dataFrom["dashboard"]) {
+            setData(dataFrom["dashboard"]);
+        }
     }, [dataFrom]);
 
-    if (!dataFrom['dashboard']) return <div>Cargando dashboard...</div>;
+    if (!data) return <div>Cargando dashboard...</div>;
 
     const {
         pedidosPorEstado = [],
@@ -57,7 +47,7 @@ const Dashboard = () => {
         topPostres = [],
         ventasPorDia = [],
         alertas = []
-    } = data || {};
+    } = data;
 
     // Estado → {pendiente, preparado, entregado}
     const estadoMap = pedidosPorEstado.reduce((acc, item) => {
@@ -108,9 +98,7 @@ const Dashboard = () => {
                     <h3>Pedidos Entregados</h3>
                     <p>{estadoMap.entregado || 0}</p>
                 </div>
-            </section>
 
-            <section className={styles.cardSection}>
                 <div className={`${styles.card} ${styles.ingresos}`}>
                     <h3>Ingresos</h3>
                     <p>${Number(ingresos).toFixed(2)}</p>
@@ -131,11 +119,11 @@ const Dashboard = () => {
                     <h3>📦 Insumos requeridos</h3>
                     <ul>
                         {insumosRequeridos.map((insumo) => {
-                            const info = dataFrom["Insumo"]?.find((i) => i.Id === insumo.insumoid);
+                            const info = dataFrom["insumo"]?.find((i) => i.id === insumo.insumoid);
                             return (
                                 <li key={insumo.insumoid}>
                                     {info
-                                        ? `${info.Nombre}: ${Math.round(insumo.cantidadtotal)}g`
+                                        ? `${info.nombre}: ${Math.round(insumo.cantidadtotal)}g`
                                         : `ID ${insumo.insumoid}: ${Math.round(insumo.cantidadtotal)}g`}
                                 </li>
                             );
@@ -152,8 +140,7 @@ const Dashboard = () => {
                         {postresOrdenados.map((item, index) => (
                             <div
                                 key={index}
-                                className={`${styles.postreCard} ${checkedPostres.includes(index) ? styles.checked : ""
-                                    }`}
+                                className={`${styles.postreCard} ${checkedPostres.includes(index) ? styles.checked : ""}`}
                                 onClick={() => toggleCheck(index)}
                             >
                                 <div className={styles.checkIcon}>
@@ -170,13 +157,19 @@ const Dashboard = () => {
 
             {/* Top postres */}
             <section className={styles.cardSection}>
-                <div className={`${styles.card} ${styles.cardSimple}`}>
+                <div className={`${styles.card} ${styles.cardRanking}`}>
                     <h3>🏆 Top 5 Postres más vendidos</h3>
-                    <ol>
+                    <ul className={styles.rankingList}>
                         {topPostres.map((p, i) => (
-                            <li key={i}>{p.nombre} — {p.total_vendidos}</li>
+                            <li key={i} className={styles.rankingItem}>
+                                <span className={styles.rankNumber}>{i + 1}</span>
+                                <div className={styles.rankingInfo}>
+                                    <span className={styles.postreName}>{p.nombre}</span>
+                                    <span className={styles.postreVentas}>{p.total_vendidos} vendidos</span>
+                                </div>
+                            </li>
                         ))}
-                    </ol>
+                    </ul>
                 </div>
             </section>
 
@@ -185,7 +178,7 @@ const Dashboard = () => {
                 <div className={`${styles.card} ${styles.cardSimple}`}>
                     <h3>📈 Ventas últimos 30 días</h3>
                     <ResponsiveContainer width="100%" height={250}>
-                        <LineChart data={ventasPorDia}>
+                        <LineChart data={ventasPorDia.map(v => ({ ...v, dia: String(v.dia) }))}>
                             <CartesianGrid strokeDasharray="3 3" />
                             <XAxis dataKey="dia" />
                             <YAxis />
@@ -200,20 +193,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-
-// PENDIENTES:
-// IMPLEMENTAR ESTADO DE TIPO DE TRANSACCION DENTRO DE LOS LOGS PARA NO RESTAR INSUMOS INMEDIATAMENTE AL REGISTRAR UN PEDIDO
-// IMPLEMENTAR LAS PLANTILLAS
-// AL MARCAR UN INSUMO COMO COMPUESTO, ELIMINAR LA NECESIDAD DE INGRESAR CANTIDAD_UNIDAD Y PRECIO_UNIDAD
-// ARREGLAR DASHBOARD
-/*
-    Este dashboard no utiliza IA actualmente.
-    Sin embargo, podrías usar IA para:
-    - Predecir demanda de insumos/postres.
-    - Detectar anomalías en ingresos/egresos.
-    - Recomendar compras de insumos.
-    - Analizar patrones de pedidos.
-    - Automatizar respuestas a clientes.
-    - Generar reportes inteligentes.
-*/

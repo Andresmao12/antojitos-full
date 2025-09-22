@@ -15,33 +15,44 @@ export const getAllOrders = async () => {
 };
 
 export const getOrderById = async (id) => {
-    console.log("-----> ID ENTRANTE: ", id)
+
     try {
-        const query = `
-            SELECT p.*, u.nombre AS nombreusuario
-            FROM pedido p
-            JOIN usuario u ON u.id = p.usuario_id
-            WHERE p.id = $1
-        `;
-        console.log(`----> EJECUTANDO QUERY... "${query}"`);
+        // Pedido
+        const pedidoQuery = await pool.query(
+            "SELECT * FROM pedido WHERE id = $1",
+            [id]
+        );
 
-        const pedido = await pool.query(query, [id]);
+        if (pedidoQuery.rows.length === 0) {
+            return res.status(404).json({ message: "Pedido no encontrado" });
+        }
 
-        const query2 = `
-            SELECT pd.*, pr.nombre AS nombreproducto
-            FROM pedido_detalle pd
-            JOIN producto pr ON pr.id = pd.producto_id
-            WHERE pd.pedido_id = $1
-        `;
-        console.log(`----> EJECUTANDO QUERY... "${query2}"`);
+        // Detalles del pedido
+        const detallesQuery = await pool.query(
+            "SELECT * FROM pedido_detalle WHERE pedido_id = $1",
+            [id]
+        );
 
-        const detalles = await pool.query(query2, [id]);
-        console.log("-----> RETORNANDO EL PEDIDO Y DETALLES: ", [{ pedido: pedido.rows[0], detalles: detalles.rows }, detalles.rows])
-        return [{ pedido: pedido.rows[0], detalles: detalles.rows }];
-    } catch (err) {
-        return { error: err.message };
-    }
+        // Factura asociada
+        const facturaQuery = await pool.query(
+            "SELECT * FROM factura WHERE pedido_id = $1",
+            [id]
+        );
+
+        const result = [
+            {
+                pedido: pedidoQuery.rows[0],
+                detalles: detallesQuery.rows,
+                factura: facturaQuery.rows[0] || null,
+            },
+        ];
+
+        return result;
+    } catch (error) {
+        console.error("❌ Error al obtener pedido:", error);
+        }
 };
+
 
 export const createOrder = async (data) => {
     const { UsuarioID, productos } = data;
@@ -130,6 +141,23 @@ export const createOrder = async (data) => {
             }
         }
 
+        // 2. Calcular total del pedido
+        const totalResult = await client.query(
+            `SELECT SUM(pd.cantidad * pr.precio_venta) AS total
+             FROM pedido_detalle pd
+             JOIN producto pr ON pr.id = pd.producto_id
+             WHERE pd.pedido_id = $1`,
+            [pedidoId]
+        );
+        const total = totalResult.rows[0]?.total || 0;
+
+        // 3. Crear factura en estado PENDIENTE (metodo_pago se define luego en front)
+        await client.query(
+            `INSERT INTO factura (pedido_id, total, metodo_pago, estado)
+             VALUES ($1, $2, $3, $4)`,
+            [pedidoId, total, "EFECTIVO", "PENDIENTE"] // EFECTIVO por defecto, editable desde front
+        );
+
         await client.query("COMMIT");
         return { success: true, pedidoId, faltantes };
 
@@ -142,7 +170,6 @@ export const createOrder = async (data) => {
     }
 };
 
-
 export const updateOrderState = async (id, data) => {
     const client = await pool.connect();
     let Estado = data.Estado.toUpperCase();
@@ -151,10 +178,10 @@ export const updateOrderState = async (id, data) => {
     try {
         await client.query("BEGIN");
 
-        // Actualizar estado
+        // 1. Actualizar estado del pedido
         await client.query(`UPDATE pedido SET estado = $1 WHERE id = $2`, [Estado, id]);
 
-        // Obtener detalles del pedido
+        // 2. Obtener detalles del pedido
         const detalles = await client.query(
             `SELECT producto_id, cantidad FROM pedido_detalle WHERE pedido_id = $1`,
             [id]
@@ -172,7 +199,7 @@ export const updateOrderState = async (id, data) => {
                 const cantidadTotal = insumo.cantidad_usada * cantidad;
 
                 if (Estado === "COMPLETADO") {
-                    // Convertir reserva en salida real
+                    // 🔹 Convertir reserva en salida real
                     await client.query(
                         `UPDATE insumo
                          SET cantidad_disponible = cantidad_disponible - $1,
@@ -194,7 +221,7 @@ export const updateOrderState = async (id, data) => {
                     );
 
                 } else if (Estado === "CANCELADO") {
-                    // Liberar reserva
+                    // 🔹 Liberar reserva
                     await client.query(
                         `UPDATE insumo
                          SET cantidad_reservada = cantidad_reservada - $1,
@@ -214,28 +241,6 @@ export const updateOrderState = async (id, data) => {
                         ]
                     );
                 }
-            }
-        }
-
-        // Factura solo en cancelado
-        if (Estado === "CANCELADO") {
-            const existing = await client.query("SELECT * FROM factura WHERE pedido_id = $1", [id]);
-            if (existing.rows.length === 0) {
-                const totalResult = await client.query(
-                    `SELECT SUM(pd.cantidad * pr.precio_venta) AS total
-                     FROM pedido_detalle pd
-                     JOIN producto pr ON pr.id = pd.producto_id
-                     WHERE pd.pedido_id = $1`,
-                    [id]
-                );
-
-                const total = totalResult.rows[0]?.total || 0;
-
-                await client.query(
-                    `INSERT INTO factura (pedido_id, total, metodo_pago, estado)
-                     VALUES ($1, $2, $3, $4)`,
-                    [id, total, "EFECTIVO", "PAGO"]
-                );
             }
         }
 
