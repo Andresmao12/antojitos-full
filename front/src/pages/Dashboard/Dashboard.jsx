@@ -22,6 +22,7 @@ const Dashboard = () => {
             try {
                 fetchAll("dashboard");
                 fetchAll("insumo");
+                fetchAll("tamanio");
             } catch (error) {
                 console.error("Error cargando dashboard:", error);
             }
@@ -46,6 +47,8 @@ const Dashboard = () => {
         insumosRequeridos = [],
         topPostres = [],
         ventasPorDia = [],
+        pedidosPorUsuario = [],
+        pedidosPendientesPorUsuario = [],
         alertas = []
     } = data;
 
@@ -85,7 +88,7 @@ const Dashboard = () => {
             )}
 
             {/* Resumen rápido */}
-            <section className={styles.cardSection}>
+            <section className={styles.cardSectionThree}>
                 <div className={`${styles.card} ${styles.pendiente}`}>
                     <h3>Pedidos Pendientes</h3>
                     <p>{estadoMap.pendiente || 0}</p>
@@ -114,7 +117,7 @@ const Dashboard = () => {
             </section>
 
             {/* Insumos requeridos */}
-            <section className={styles.cardSection}>
+            <section className={styles.cardSectionOne}>
                 <div className={`${styles.card} ${styles.cardSimple}`}>
                     <h3>📦 Insumos requeridos</h3>
                     <ul>
@@ -133,7 +136,7 @@ const Dashboard = () => {
             </section>
 
             {/* Postres pendientes */}
-            <section className={styles.cardSection}>
+            <section className={styles.cardSectionTwo}>
                 <div className={styles.cardPostres}>
                     <h3>🍰 Postres por sabor y tamaño</h3>
                     <div className={styles.postresGrid}>
@@ -153,10 +156,48 @@ const Dashboard = () => {
                         ))}
                     </div>
                 </div>
+
+
+                {/* Pedidos pendientes por cliente */}
+                <div className={`${styles.card} ${styles.cardRanking}`}>
+                    <h3>👥 Pedidos pendientes por cliente</h3>
+
+                    {pedidosPendientesPorUsuario.length === 0 && (
+                        <p className={styles.emptyText}>No hay pedidos pendientes</p>
+                    )}
+
+                    <div className={styles.clientesGrid}>
+                        {pedidosPendientesPorUsuario.map((u) => (
+                            <div key={u.usuarioid} className={styles.clienteCard}>
+                                <h4 className={styles.clienteNombre}>
+                                    <i className="fa-solid fa-user"></i> {u.usuario}
+                                </h4>
+
+                                <div className={styles.pedidosCont}>
+                                    <ul className={styles.pedidosList}>
+                                        {u.pedidos.map((p, i) => (
+                                            <li key={i} className={styles.pedidoItem}>
+                                                <span className={styles.postreName}>{p.postre}</span>
+                                                <span className={styles.postreSize}>
+                                                    Tamaño: {dataFrom["tamanio"]?.find(t => t.id === p.tamanioid)?.nombre || p.tamanioid}
+                                                </span>
+                                                <span className={styles.postreCantidad}>
+                                                    {p.cantidad} u.
+                                                </span>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </section>
 
+
+
             {/* Top postres */}
-            <section className={styles.cardSection}>
+            <section className={styles.cardSectionTwo}>
                 <div className={`${styles.card} ${styles.cardRanking}`}>
                     <h3>🏆 Top 5 Postres más vendidos</h3>
                     <ul className={styles.rankingList}>
@@ -171,10 +212,29 @@ const Dashboard = () => {
                         ))}
                     </ul>
                 </div>
+
+
+                {/* Top usuarios */}
+                <div className={`${styles.card} ${styles.cardRanking}`}>
+                    <h3>👤 Top 10 Clientes</h3>
+                    <ul className={styles.rankingList}>
+                        {data.topClientes?.map((u, i) => (
+                            <li key={u.id} className={styles.rankingItem}>
+                                <span className={styles.rankNumber}>{i + 1}</span>
+                                <div className={styles.rankingInfo}>
+                                    <span className={styles.postreName}>{u.nombre}</span>
+                                    <span className={styles.postreVentas}>
+                                        {u.total_pedidos} pedidos · ${Number(u.total_gastado).toFixed(2)}
+                                    </span>
+                                </div>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
             </section>
 
             {/* Ventas por día */}
-            <section className={styles.cardSection}>
+            <section className={styles.cardSectionOne}>
                 <div className={`${styles.card} ${styles.cardSimple}`}>
                     <h3>📈 Ventas últimos 30 días</h3>
                     <ResponsiveContainer width="100%" height={250}>

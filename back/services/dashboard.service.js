@@ -101,11 +101,36 @@ export const getDashboardData = async () => {
       GROUP BY DATE(f.fecha_factura)
       ORDER BY dia ASC
     `);
+    // H. Pedidos pendientes detallados por usuario
+    const pedidosPendientesDetallados = await pool.query(`
+  SELECT u.id AS usuarioid, u.nombre AS usuario, 
+         pr.nombre AS postre, pr.tamanio_id AS tamanioid, 
+         SUM(pd.cantidad) AS cantidad
+  FROM pedido p
+  JOIN usuario u ON u.id = p.usuario_id
+  JOIN pedido_detalle pd ON pd.pedido_id = p.id
+  JOIN producto pr ON pr.id = pd.producto_id
+  WHERE p.estado = 'PENDIENTE'
+  GROUP BY u.id, u.nombre, pr.nombre, pr.tamanio_id
+  ORDER BY u.nombre
+`);
 
-    // H. Calcular utilidad
+    // Convertir en estructura { usuario → [postres...] }
+    const pedidosPorUsuario = pedidosPendientesDetallados.rows.reduce((acc, row) => {
+      const { usuarioid, usuario, postre, tamanioid, cantidad } = row;
+      let existente = acc.find(u => u.usuarioid === usuarioid);
+      if (!existente) {
+        existente = { usuarioid, usuario, pedidos: [] };
+        acc.push(existente);
+      }
+      existente.pedidos.push({ postre, tamanioid, cantidad });
+      return acc;
+    }, []);
+
+    // I. Calcular utilidad
     const utilidad = (Number(ingresos.rows[0]?.totalingresos) || 0) - (Number(egresos.rows[0]?.totalegresos) || 0);
 
-    // I. Alertas básicas
+    // J. Alertas básicas
     const alertas = [];
     if (utilidad < 0) {
       alertas.push({ tipo: "flujo_caja", mensaje: "⚠️ Los egresos superan a los ingresos en el periodo." });
@@ -113,6 +138,20 @@ export const getDashboardData = async () => {
     if (insumosRequeridosFinal.length > 0) {
       alertas.push({ tipo: "produccion", mensaje: "📦 Hay insumos requeridos pendientes de compra." });
     }
+
+    // J. Top clientes (por total gastado)
+    const topClientes = await pool.query(`
+  SELECT u.id, u.nombre,
+         COUNT(p.id) AS total_pedidos,
+         COALESCE(SUM(f.total), 0) AS total_gastado
+  FROM usuario u
+  LEFT JOIN pedido p ON p.usuario_id = u.id
+  LEFT JOIN factura f ON f.pedido_id = p.id
+  GROUP BY u.id, u.nombre
+  ORDER BY total_gastado DESC
+  LIMIT 10
+`);
+
 
     return {
       pedidosPorEstado: estados.rows,
@@ -123,6 +162,8 @@ export const getDashboardData = async () => {
       insumosRequeridos: insumosRequeridosFinal,
       topPostres: topPostres.rows,
       ventasPorDia: ventasPorDia.rows,
+      pedidosPendientesPorUsuario: pedidosPorUsuario,
+      topClientes: topClientes.rows,   // 👈 aquí
       alertas
     };
 
@@ -134,6 +175,3 @@ export const getDashboardData = async () => {
     };
   }
 };
-
-
-GASTO: 272.750
