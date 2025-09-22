@@ -127,7 +127,7 @@ const AddPlantillaModal = ({ handleShowModal, handleRefresh }) => {
         }
     };
 
-    const excludedNamedb = ['id', 'url_imagen', 'fecha_creacion', 'datos_proceso', 'plantilla_id', 'es_plantilla'];
+    const excludedNamedb = ['id', 'url_imagen', 'fecha_creacion','tamanio_id', 'datos_proceso', 'plantilla_id', 'es_plantilla'];
 
     return (
         <div className={styles.modalOverlay}>

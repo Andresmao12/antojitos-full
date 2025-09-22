@@ -33,7 +33,7 @@ export const getProductById = async (id) => {
 export const createProduct = async (data) => {
     const {
         nombre,
-        url_imagen,
+        url_imagen = 'https://i.imgur.com/WYapRKg.png',
         descripcion,
         tamanio_id,
         datos_proceso,
@@ -56,7 +56,7 @@ export const createProduct = async (data) => {
         console.log(`----> EJECUTANDO QUERY Producto: "${queryProducto}"`);
 
         const resultProd = await client.query(queryProducto, [
-            nombre, url_imagen, descripcion, precio_venta, datos_proceso, tamanio_id,  es_plantilla
+            nombre, url_imagen, descripcion, precio_venta, datos_proceso, tamanio_id, es_plantilla
         ]);
 
         const productoId = resultProd.rows[0].id;

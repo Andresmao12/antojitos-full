@@ -50,9 +50,19 @@ const AddPedidoModal = ({ handleShowCreate, handleRefresh }) => {
                 Estado: "pendiente",
                 productos: detallePedido
             }
-            await createItem(pedido)
+
+            const result = await createItem(pedido);
+
+            if (result.faltantes?.length > 0) {
+                const lista = result.faltantes.map(f =>
+                    `Insumo ${f.insumo_id}: faltan ${f.faltante}g (costo: $${f.costo_faltante})`
+                ).join("\n");
+                alert("⚠️ El pedido se registró, pero hay insumos faltantes:\n\n" + lista);
+            }
+
             await handleRefresh()
             handleShowCreate()
+
         } catch (e) {
             console.error("Error al crear el pedido: ", e)
         }
