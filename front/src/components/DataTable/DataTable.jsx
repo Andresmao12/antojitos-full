@@ -3,12 +3,14 @@ import styles from "./DataTable.module.css"
 import buttonStyles from "../../styles/buttons.module.css"
 import { useApi } from '../../hooks/useApi'
 
+import { SHEMA_DB } from '../../utils/constants'
+
 // RECIBIR TABLESHEMA
 const DataTable = ({ data, getId, schema = null }) => {
   const { fetchAll, dataFrom } = useApi()
 
   // valores a excluir (todo en minúsculas para comparar)
-  const excludeValores = ['rol_id', 'estado', 'compuesto',  'id']
+  const excludeValores = ['rol_id', 'estado', 'compuesto', 'id']
 
   const toTitle = (s = '') =>
     s
@@ -19,7 +21,16 @@ const DataTable = ({ data, getId, schema = null }) => {
 
   const getFriendlyName = (initialName) => {
     if (!schema) return toTitle(initialName)
-    const column = schema.columns.find(col => col.namedb.toLowerCase() === initialName.toLowerCase())
+    let newName = initialName;
+
+    if (initialName.includes('_id')) {
+
+      newName = initialName.toLowerCase().replace("_id", "");
+      const relationSchema = schema.relations?.find(rel => rel.fk.toLowerCase() === initialName.toLowerCase())
+      if (relationSchema) return relationSchema.name
+    }
+
+    const column = schema.columns.find(col => col.namedb.toLowerCase() === newName)
     return column ? column.name : toTitle(initialName)
   }
 
@@ -83,6 +94,7 @@ const DataTable = ({ data, getId, schema = null }) => {
         <tr className={styles.head}>
           {Object.keys(data[0]).map((key) => {
             if (excludeValores.includes(key.toLowerCase())) return null
+            console.log('KEY EN TABLE: ', key)
             return <th key={key} className={styles.head_data}>{getFriendlyName(key)}</th>
           })}
           <th className={styles.head_data}>Acciones</th>

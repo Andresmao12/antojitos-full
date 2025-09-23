@@ -109,12 +109,12 @@ const PostreView = () => {
                             <p>No hay capas definidas.</p>
                         ) : (
                             <div className={styles.capasContainer}>
-                                {Object.entries(DataProceso.capas).map((element, idx) => {
-                                    console.log("DATA PROCESO CAPAS", element)
-                                    const nameIngrediente = dataFrom["insumo"]?.find(i => i.id === ingrediente_id)?.nombre || 'Insumo desconocido'
+                                {Object.entries(DataProceso.capas).map(([nombreCapa, info], idx) => {
+                                    console.log('Info de la capa:', info);
+                                    const nameIngrediente = dataFrom['insumo']?.find(i => i.id == info?.ingrediente)?.nombre || 'Insumo desconocido';
 
                                     return <div key={idx} className={styles.capaItem}>
-                                        <strong>{nameIngrediente}:</strong> {nameIngrediente} - {cantidad}
+                                        <strong>{nombreCapa}:</strong> {nameIngrediente} - {info.cantidad}
                                     </div>
                                 })}
                             </div>

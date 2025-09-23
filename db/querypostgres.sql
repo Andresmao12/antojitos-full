@@ -23,7 +23,7 @@ create table usuario (
     celular varchar(20),
     direccion text,
     estado boolean default true,
-    fecha_registro timestamp default current_timestamp,
+    fecha_registro timestamptz default current_timestamp,
     rol_id int not null references rol(id)
 );
 
@@ -47,7 +47,7 @@ create table insumo (
         end
     ) stored,
     cantidad_disponible numeric(12,2) default 0,
-    fecha_actualizacion timestamp default current_timestamp
+    fecha_actualizacion timestamptz default current_timestamp
 );
 
 
@@ -59,7 +59,7 @@ create table producto (
     tamanio_id int references tamanio(id),
     datos_proceso jsonb,
     precio_venta numeric(10,2),
-    fecha_creacion timestamp default current_timestamp,
+    fecha_creacion timestamptz default current_timestamp,
     es_plantilla boolean default false
 );
 
@@ -68,7 +68,7 @@ create table producto_insumo (
     producto_id int not null references producto(id),
     insumo_id int not null references insumo(id),
     cantidad numeric(12,2) not null,
-    fecha_registro timestamp default current_timestamp
+    fecha_registro timestamptz default current_timestamp
 );
 
 create table insumo_composicion (
@@ -83,7 +83,7 @@ create table insumo_composicion (
 create table pedido (
     id serial primary key,
     usuario_id int not null references usuario(id),
-    fecha_pedido timestamp default current_timestamp,
+    fecha_pedido timestamptz default current_timestamp,
     estado estado_pedido_enum default 'PENDIENTE'
 );
 
@@ -97,7 +97,7 @@ create table pedido_detalle (
 create table factura (
     id serial primary key,
     pedido_id int not null references pedido(id),
-    fecha_factura timestamp default current_timestamp,
+    fecha_factura timestamptz default current_timestamp,
     total numeric(10,2) not null,
     metodo_pago metodo_pago_enum not null,
     estado estado_factura_enum default 'PENDIENTE'
@@ -107,7 +107,7 @@ create table log_insumo (
     id serial primary key,
     insumo_id int not null references insumo(id),
     usuario_id int not null references usuario(id),
-    fecha_movimiento timestamp default current_timestamp,
+    fecha_movimiento timestamptz default current_timestamp,
     tipo_movimiento tipo_movimiento_enum not null,
     cantidad numeric(8,2) not null,
     motivo text

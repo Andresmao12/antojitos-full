@@ -14,21 +14,20 @@ import { useApi } from '../../hooks/useApi'
 const Pedidos = () => {
 
     const tableSchema = SHEMA_DB.tables.find(element => element.name?.toLowerCase() === 'pedidos')
-    console.log('tableSchema DESDE PEDIDOS: ', tableSchema)
 
-    const { data, fetchAll, fetchById, createItem, updateItem, deleteItem, loading, error, item } = useApi(tableSchema)
-    const [formData, setFormData] = useState({})
+    const { data, fetchAll } = useApi(tableSchema)
     const [showCreate, setShowCreate] = useState(false)
 
     const [detalleId, setDetalleId] = useState(null)
 
+    useEffect(() => {
+        (async () => await fetchAll())()
+    }, []);
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
-    useEffect(() => { fetchAll() }, []);
+    useEffect(() => {
+        console.log('DATA PEDIDOS = ', data)
+        console.log('SHEMA PEDIDOS = ', tableSchema)
+    }, [data, tableSchema])
 
     const handleVerDetalle = (pedidoId) => {
         setDetalleId(pedidoId)
@@ -47,7 +46,7 @@ const Pedidos = () => {
             {detalleId && <PedidoDetalle pedidoId={detalleId} tableSchema={tableSchema} handleShowDetalle={handleVerDetalle} handleRefresh={handleRefresh} />}
 
             <div className={styles.registersCont}>
-                <DataTable data={data} getId={handleVerDetalle} />
+                <DataTable data={data} getId={handleVerDetalle} schema={tableSchema}/>
             </div>
         </>
     )
