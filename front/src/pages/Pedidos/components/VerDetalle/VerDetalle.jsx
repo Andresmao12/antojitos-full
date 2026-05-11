@@ -12,6 +12,7 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh
 
     const [estadoPedido, setEstadoPedido] = useState("");
     const [nuevoEstadoPedido, setNuevoEstadoPedido] = useState("");
+    const [nombreUsuario, setNombreUsuario] = useState("Desconocido");
 
     const [estadoFactura, setEstadoFactura] = useState("");
     const [nuevoEstadoFactura, setNuevoEstadoFactura] = useState("");
@@ -25,6 +26,8 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh
         const fetchPedido = async () => {
             await fetchById(pedidoId);
             await fetchAll("producto");
+            await fetchAll("usuario")
+            await fetchAll("tamanio")
         };
         fetchPedido();
     }, [pedidoId]);
@@ -34,9 +37,13 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh
         if (item) {
             setPedido(item[0].pedido);
             setDetalles(item[0].detalles);
+            console.log("PEDIDO DETALLE ITEM:", item[0]);
 
             setEstadoPedido(item[0].pedido?.estado || "PENDIENTE");
             setNuevoEstadoPedido(item[0].pedido?.estado || "PENDIENTE");
+
+            const newNombreUsuario = dataFrom["usuario"]?.find(u => u.id === item[0].pedido.usuario_id)?.nombre || "Desconocido";
+            setNombreUsuario(newNombreUsuario);
 
             if (item[0].factura) {
                 setFactura(item[0].factura);
@@ -45,7 +52,7 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh
                 setMetodoPago(item[0].factura.metodo_pago);
             }
         }
-    }, [item]);
+    }, [item, dataFrom]);
 
     // Guardar cambios unificados (pedido + factura)
     const handleGuardarCambios = async () => {
@@ -110,7 +117,8 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh
                 {mensaje && <p className={styles.feedbackMsg}>{mensaje}</p>}
 
                 <div className={styles.infoBox}>
-                    <p><strong>Usuario:</strong> {pedido.nombreusuario}</p>
+
+                    <p><strong>Usuario:</strong> {nombreUsuario}</p>
                     <p><strong>Fecha:</strong> {new Date(pedido.fecha_pedido).toLocaleString()}</p>
 
                     <div className={styles.estadoSelector}>
@@ -135,9 +143,12 @@ const PedidoDetalle = ({ pedidoId, tableSchema, handleShowDetalle, handleRefresh
                     <ul className={styles.listaProductos}>
                         {detalles?.map((item) => {
                             const productoInfo = dataFrom["producto"]?.find(p => p.id === item.producto_id);
+                            const tamanio = dataFrom["tamanio"]?.find(t => t.id === productoInfo?.tamanio_id);
+                            console.log("ITEM:", item, "PRODUCTO INFO:", productoInfo, "TAMAÑO:", tamanio);
                             return (
                                 <li key={item.id} className={styles.productoItem}>
-                                    {(productoInfo?.nombre || item.nombreproducto) ?? "Producto desconocido"} x {item.cantidad}
+                                    {(productoInfo?.nombre || item.nombreproducto) ?? "Producto desconocido"}{" "}
+                                    {tamanio ? `(${tamanio.nombre})` : "(Tamaño desconocido)"} x {item.cantidad}
                                 </li>
                             );
                         })}

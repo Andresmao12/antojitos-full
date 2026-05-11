@@ -12,7 +12,6 @@
 }
 
 .formCont {
-
     width: 90%;
     max-width: 600px;
     max-height: 90%;
@@ -22,15 +21,14 @@
     flex-direction: column;
     gap: 1em;
 
-    /* background-color: var(--bg-color); */
-    background-color: #fff8f0;
+    background-color: var(--surface-color);
     padding: 2rem;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     z-index: 100;
-    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    box-shadow: var(--shadow-md);
 
-    & h2 {
-        color: #8b4513;
+    & h2, h3 {
+        color: var(--primary-mid);
     }
 }
 
@@ -48,16 +46,17 @@
 .inpCont {
     display: flex;
     align-items: center;
-
     position: relative;
     width: 100%;
     height: 50px;
     margin-top: 1em;
+
 }
 
 
 .inpCont label {
     position: absolute;
+    color: var(--text-color);
     left: 1em;
     font-weight: 400;
     opacity: .5;
@@ -79,18 +78,18 @@
 .inpCont input {
     width: 100%;
     height: 100%;
-    background-color: #fff;
-    color: #000;
+    background-color: var(--surface-color-2);
+    color: var(--text-color);
     outline: none;
-    border: 2px solid rgba(0, 0, 0, 0.1);
+    border: 2px solid var(--border-color);
     font-size: 16px;
     padding: 20px 45px 20px 20px;
-    border-radius: 40px;
+    border-radius: var(--border-radius-pill);
 }
 
 
 .inpCont input:focus {
-    border-color: var(--text-color-aux);
+    border-color: var(--accent-color);
 }
 
 
@@ -103,7 +102,7 @@
     grid-auto-rows: min-content;
     align-items: end;
     gap: .8em;
-
+    /* color: var(--text-color); */
 
     & *:last-child {
         /* height: min-content;
@@ -121,24 +120,23 @@
 .datosProcesoCont {
     margin-top: 2rem;
     padding: 1.5rem;
-    background-color: #fff8f0;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-sm);
 
     display: flex;
     flex-direction: column;
     gap: 1.3em;
 
     & :is(h2, h3) {
-        color: #8b4513;
-
+        color: var(--primary-mid);
     }
 }
 
 .ingredientesList {
     list-style: disc;
     padding-left: 1.5rem;
-    color: #333;
+    color: var(--text-color);
 }
 
 .ingrentesSection,
@@ -156,23 +154,23 @@
 }
 
 .capaItem {
-    background: #f4e4d5;
+    background: var(--blush-color);
     padding: 0.5rem 1rem;
-    border-radius: 8px;
+    border-radius: var(--border-radius);
 }
 
 .notas {
     margin-top: 0.5rem;
     font-style: italic;
-    background: #fff1e6;
+    background: var(--cream-color);
     padding: 0.75rem;
-    border-left: 4px solid #ffa500;
+    border-left: 4px solid var(--accent-color);
     border-radius: 4px;
 }
 
 .itemAddCont {
     width: 100%;
-    border: 1px solid red;
+    border: 1px solid var(--danger-color);
     height: 10px;
 }
 
@@ -180,7 +178,6 @@
 .addButton {
     height: 80%;
     font-size: 25px;
-
 }
 
 
@@ -196,7 +193,7 @@
     gap: 1rem;
     font-weight: 500;
     cursor: pointer;
-    user-select: none;
+    /* user-select: none; REVISAR*/
     position: relative;
 }
 
@@ -211,11 +208,10 @@
     display: inline-block;
     width: 42px;
     height: 22px;
-    background-color: #ccc;
+    background-color: var(--border-color-dark);
     border-radius: 34px;
     transition: background-color 0.3s;
 }
-
 
 .slider::before {
     content: "";
@@ -224,13 +220,13 @@
     width: 18px;
     left: 2px;
     bottom: 2px;
-    background-color: white;
+    background-color: var(--surface-color-2);
     border-radius: 50%;
     transition: transform 0.3s;
 }
 
 .switchInput:checked+.slider {
-    background-color: #4caf50;
+    background-color: var(--success-color);
 }
 
 .switchInput:checked+.slider::before {
@@ -252,23 +248,20 @@
     justify-content: space-between;
 
     padding: .5em;
-    border-radius: 10px;
-    box-shadow: 0 0 4px -1px var(--tertiary-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
 }
 
 .ingredientesCont {
     height: max-content;
-    /* max-height: 150px;
-    overflow-y: auto; */
 
     display: flex;
     flex-direction: column;
     gap: 4px;
 
     padding: .5em;
-    border-radius: 10px;
-    /* background-color: var(--cuartiary-color); */
-    background-color: #f4e4d5;
+    border-radius: var(--border-radius);
+    background-color: var(--blush-color);
 }
 
 
@@ -280,15 +273,15 @@
 
     width: 100%;
     padding: 10px 40px 10px 15px;
-    border: 1px solid #ccc;
-    border-radius: 12px;
-    background-color: #f9f9f9;
-    color: #333;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--surface-color);
+    color: var(--text-color);
     font-size: 16px;
 
     position: relative;
 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-sm);
     transition: all 0.3s ease;
     cursor: pointer;
 }
@@ -302,7 +295,7 @@
     content: "▼";
 
     font-size: 10px;
-    color: #666;
+    color: var(--text-color-aux);
     position: absolute;
     right: 15px;
     top: 50%;
@@ -311,24 +304,25 @@
 }
 
 .select:focus {
-    border-color: #7c3aed;
-    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    border-color: var(--primary-mid);
+    box-shadow: 0 0 0 3px rgba(92, 26, 122, 0.2);
     outline: none;
 }
 
 .imageDropZone {
-    border: 2px dashed #bbb;
-    border-radius: 12px;
+    border: 2px dashed var(--border-color-dark);
+    border-radius: var(--border-radius);
     padding: 1rem;
     text-align: center;
-    background-color: #f9f9f9;
+    background-color: var(--surface-color);
     margin-bottom: 1rem;
     transition: background-color 0.2s ease;
     cursor: pointer;
+    color: var(--text-color);
 }
 
 .imageDropZone:hover {
-    background-color: #f1f1f1;
+    background-color: var(--bg-color);
 }
 
 .imageDropZone input[type="file"] {
@@ -339,6 +333,6 @@
     margin-top: 1rem;
     max-width: 100%;
     height: auto;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
 }

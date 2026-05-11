@@ -63,8 +63,8 @@ export const createProduct = async (data) => {
 
         if (insumos.length > 0) {
             const queryInsumo = `
-                INSERT INTO producto_insumo (insumo_id, producto_id, cantidad, precio_unitario)
-                VALUES ($1, $2, $3, $4)
+                INSERT INTO producto_insumo (insumo_id, producto_id, cantidad)
+                VALUES ($1, $2, $3)
             `;
             console.log(`----> EJECUTANDO QUERY Insumos: "${queryInsumo}"`);
 
@@ -72,8 +72,7 @@ export const createProduct = async (data) => {
                 await client.query(queryInsumo, [
                     insumo.insumoId,
                     productoId,
-                    insumo.cantidad,
-                    insumo.precioUnitario || 0
+                    insumo.cantidad
                 ]);
             }
         }

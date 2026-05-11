@@ -7,7 +7,7 @@
 
     display: flex;
     align-items: center;
-    gap: .5em;
+    gap: .5rem;
 }
 
 
@@ -15,18 +15,18 @@
 
 .formCreate {
     width: 100%;
-    padding: 2em 0;
+    padding: 2rem 0;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1em;
+    gap: 1rem;
 
 }
 
-
+/* REVISAR SI EL TEXT AREA SE USA */
 .inpCont,
-.inpContTextArea {
+.inpContTextArea { 
     display: flex;
     align-items: center;
 
@@ -38,7 +38,7 @@
 
 .inpCont label {
     position: absolute;
-    left: 1em;
+    left: 1rem;
     font-weight: 400;
     opacity: .5;
     transition: 500ms;
@@ -53,10 +53,12 @@
     opacity: .8;
 }
 
+
+/* REVISAR SI EL TEXT AREA SE USA */
 .inpContTextArea label {
     position: absolute;
     top: 10px;
-    left: 1em;
+    left: 1rem;
     font-weight: 400;
     opacity: .5;
     transition: 500ms;
@@ -114,14 +116,14 @@
 .inpGroup {
     width: 100%;
     display: flex;
-    gap: .8em;
+    gap: .8rem;
 }
 
 .btnGroup {
     align-self: flex-end;
 
     display: flex;
-    gap: .5em;
+    gap: .5rem;
 }
 
 .addButton {

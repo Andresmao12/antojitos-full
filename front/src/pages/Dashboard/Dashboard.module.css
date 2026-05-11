@@ -1,14 +1,21 @@
 .dashboard {
     padding: 2rem;
-    background-color: #f0f2f5;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #333;
+    background-color: var(--bg-color);
+    color: var(--text-color);
 }
 
 .dashboard h1 {
     font-size: 2.5rem;
     margin-bottom: 2rem;
-    color: #2c3e50;
+    color: var(--text-color);
+}
+
+.card {
+    color: var(--text-color);
+
+    & h3 {
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
 }
 
 .cardSectionThree {
@@ -35,10 +42,10 @@
 /* Tarjeta base */
 .card,
 .cardPostres {
-    background-color: white;
-    border-radius: 1rem;
+    background-color: var(--surface-color);
+    border-radius: var(--border-radius-lg);
     padding: 1.5rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 
     position: relative;
@@ -47,39 +54,43 @@
 
 .card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+    box-shadow: var(--shadow-md);
 }
 
-/* Colores por tipo */
+
+/* Tarjetas por tipo */
 .pendiente {
-    background: linear-gradient(135deg, #fcd34d, #fbbf24);
+    background: var(--pendiente-color);
 }
 
 .preparado {
-    background: linear-gradient(135deg, #60a5fa, #3b82f6);
+    background: var(--preparado-color);
 }
 
 .entregado {
-    background: linear-gradient(135deg, #34d399, #10b981);
+    background: var(--entregado-color);
 }
 
 .ingresos {
-    background: linear-gradient(135deg, #4ade80, #22c55e);
+    background: var(--ingresos-color);
 }
 
 .egresos {
-    background: linear-gradient(135deg, #f87171, #ef4444);
+    background: var(--egresos-color);
+}
+
+.utilidad {
+    background: var(--utilidad-color);
 }
 
 .cardSimple,
 .cardPostres {
-    background-color: #ffffff;
-    color: #333;
+    background-color: var(--surface-color);
+    color: var(--text-color);
     min-height: 200px;
 }
 
 .cardPostres {
-
     display: flex;
     flex-direction: column;
     gap: 1em;
@@ -113,63 +124,41 @@
 
 .postresGrid {
     display: grid;
-    /* grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); */
     gap: 1rem;
 }
 
 .postreCard {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-left: 4px solid #6366f1;
+    background-color: var(--surface-color-2 );
+    border: 1px solid var(--border-color);
+    border-left: 4px solid var(--primary-mid);
     padding: 1rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-    transition: transform 0.2s ease;
-}
-
-.postreCard:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
-}
-
-.postreCard h4 {
-    margin: 0;
-    color: #374151;
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-}
-
-
-.cardInsFaltantes
-
-/* .cardPostres  */
-    {
-    /* height: 40%; */
-    overflow-y: auto;
-}
-
-
-
-
-.postreCard {
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-left: 4px solid #6366f1;
-    padding: 1rem;
-    border-radius: 0.75rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease, background-color 0.2s ease;
     cursor: pointer;
     position: relative;
 }
 
 .postreCard:hover {
+    background-color: var(--accent-color);
     transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+}
+
+.postreCard h4 {
+    margin: 0;
+    color: var(--accent-soft);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.cardInsFaltantes {
+    overflow-y: auto;
 }
 
 .postreCard.checked {
-    border-left-color: #10b981;
-    background-color: #ecfdf5;
+    border-left-color: var(--success-color);
+    background-color: var(--cream-color);
 }
 
 .checkIcon {
@@ -177,17 +166,16 @@
     top: 0.5rem;
     right: 0.75rem;
     font-size: 1.25rem;
-    color: #10b981;
+    color: var(--success-color);
     font-weight: bold;
 }
 
 
 .alertSection {
-
     padding: .8rem 0 .8rem .8em;
     margin: 1em 0;
-    border-radius: 1rem;
-    background-color: rgb(255, 228, 118);
+    border-radius: var(--border-radius);
+    background-color: var(--gold-color);
 }
 
 .cardRanking {
@@ -201,7 +189,7 @@
     font-weight: 600;
     margin: 0;
     text-align: center;
-    color: #1f2937;
+    color: var(--text-color);
 }
 
 .rankingList {
@@ -218,20 +206,21 @@
     align-items: center;
     gap: 1rem;
     padding: 0.75rem 1rem;
-    border-radius: 0.75rem;
-    background-color: #f9fafb;
+    border-radius: var(--border-radius);
+    background-color: var(--surface-color);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .rankingItem:hover {
     transform: translateY(-3px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    background-color: var(--blush-color);
+    box-shadow: var(--shadow-sm);
 }
 
 .rankNumber {
     font-size: 1.2rem;
     font-weight: 700;
-    color: #6366f1;
+    color: var(--primary-mid);
     width: 2rem;
     text-align: center;
 }
@@ -245,18 +234,12 @@
 .postreName {
     font-size: 1rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--text-color);
 }
 
 .postreVentas {
     font-size: 0.85rem;
-    color: #6b7280;
-}
-
-.cardRanking {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+    color: var(--accent-color);
 }
 
 .clientesGrid {
@@ -266,14 +249,15 @@
 }
 
 .clienteCard {
-    background: #fff;
-    border-radius: 1rem;
+    background: var(--surface-color-2);
+    border-radius: var(--border-radius-lg);
     padding: 1rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    box-shadow: var(--shadow-sm);
     transition: transform 0.2s ease;
 }
 
 .clienteCard:hover {
+    background-color: var(--accent-color);
     transform: translateY(-2px);
 }
 
@@ -281,7 +265,7 @@
     font-size: 1.1rem;
     font-weight: 600;
     margin-bottom: .8rem;
-    color: #333;
+    color: var(--accent-soft);
     display: flex;
     align-items: center;
     gap: .5rem;
@@ -296,13 +280,13 @@
     list-style: none;
 }
 
-.pedidoItem {
+.card .pedidoItem {
     display: grid;
     grid-template-columns: 1fr auto auto;
     gap: .8rem;
     padding: .5rem .6rem;
-    border-radius: .6rem;
-    background: #f9f9f9;
+    border-radius: var(--border-radius);
+    background: var(--surface-color-2);
 }
 
 .postreName {
@@ -311,10 +295,10 @@
 
 .postreSize {
     font-size: .85rem;
-    color: #666;
+    color: var(--accent-soft);
 }
 
 .postreCantidad {
     font-weight: 600;
-    color: #444;
+    color: var(--text-color);
 }

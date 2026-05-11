@@ -20,17 +20,17 @@
 
     display: flex;
     flex-direction: column;
-    gap: 1em;
+    gap: 1rem;
 
     /* background-color: var(--bg-color); */
-    background-color: #fff8f0;
+    background-color: var(--bg-color);
     padding: 2rem;
-    border-radius: 10px;
+    border-radius: var(--border-radius);
     z-index: 100;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
 
     & h2 {
-        color: #8b4513;
+        color: var(--primary-color);
     }
 }
 
@@ -38,27 +38,28 @@
 .btnCloseModal {
     position: absolute;
     height: min-content;
-    right: 2.2em;
-    top: 1.6em;
+    right: 2.2rem;
+    top: 1.6rem;
 
-    font-size: 1.5em;
+    font-size: 1.5rem;
 }
 
 
+/* REVISAR SI EL MAX HEIGHT NO AFECTA A LA HORA DE USAR UN TEXT AREA */
 .inpCont {
     display: flex;
     align-items: center;
-
     position: relative;
     width: 100%;
-    height: 50px;
-    margin-top: 1em;
+    max-height: 3rem;
+    margin-top: 1rem;
 }
 
 
 .inpCont label {
     position: absolute;
-    left: 1em;
+    left: 1rem;
+    color: var(--text-color);
     font-weight: 400;
     opacity: .5;
     cursor: text;
@@ -68,9 +69,8 @@
 
 .inpCont input:focus~label,
 .inpCont input:not(:placeholder-shown)~label {
-    top: -45%;
+    top: -55%;
     left: 0;
-
     font-size: 14px;
     opacity: .8;
 }

@@ -140,20 +140,23 @@ const Dashboard = () => {
                 <div className={styles.cardPostres}>
                     <h3>🍰 Postres por sabor y tamaño</h3>
                     <div className={styles.postresGrid}>
-                        {postresOrdenados.map((item, index) => (
-                            <div
-                                key={index}
-                                className={`${styles.postreCard} ${checkedPostres.includes(index) ? styles.checked : ""}`}
-                                onClick={() => toggleCheck(index)}
-                            >
-                                <div className={styles.checkIcon}>
-                                    {checkedPostres.includes(index) && <span>✔</span>}
+                        {postresOrdenados.map((item, index) => {
+                            console.log("IITAM: ", item);
+                            return (
+                                <div
+                                    key={index}
+                                    className={`${styles.postreCard} ${checkedPostres.includes(index) ? styles.checked : ""}`}
+                                    onClick={() => toggleCheck(index)}
+                                >
+                                    <div className={styles.checkIcon}>
+                                        {checkedPostres.includes(index) && <span>✔</span>}
+                                    </div>
+                                    <h4>{item.nombre}</h4>
+                                    <p><strong>Tamaño:</strong> {(item.tamanioid && dataFrom["tamanio"]) && dataFrom["tamanio"]?.find(u => u.id == item.tamanioid).nombre}</p>
+                                    <p><strong>Cantidad:</strong> {item.cantidadtotal}</p>
                                 </div>
-                                <h4>{item.nombre}</h4>
-                                <p><strong>Tamaño:</strong> {item.tamanioid}</p>
-                                <p><strong>Cantidad:</strong> {item.cantidadtotal}</p>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 </div>
 

@@ -1,23 +1,24 @@
 .sidebar {
     min-width: 150px;
     height: 100%;
-    
+    width: 12%;
+
     background-color: var(--primary-color);
-    color: var(--text-color);
-    padding:.5em;
+    color: var(--text-color-aux);
+    padding: 2rem 0 .5rem;
 
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    gap: 1em;
+    gap: 1rem;
 
 
     flex-shrink: 0;
 }
 
+/* Pensado para cuando se añada el logo */
 .titleCont {
-
     display: flex;
     gap: 5px;
 }
@@ -28,7 +29,7 @@
 } */
 
 /* .title {
-    font-size: 2.3em;
+    font-size: 2.3rem;
     text-align: center;
 } */
 
@@ -37,27 +38,98 @@
     width: 100%;
 
     display: flex;
+    align-items: center;
     flex-direction: column;
-    gap: .5em;
+    gap: .5rem;
 }
 
 .link {
     width: 100%;
-    padding: 0.5em 1em;
-    border-radius: var(--border-radius);
-    color: var(--text-color);  
-    /* letter-spacing: 1px; */
+    padding: 0.8rem 1rem;
+    border-radius: 0 var(--border-radius) var(--border-radius);
+    color: var(--text-color-aux);
+
+    text-align: center;
+    /* font-weight: 900; */
+    letter-spacing: 1px;
     text-decoration: none;
 
     transition: background 0.3s;
 }
 
-.link:hover,
-.link.active {
-    background-color: var(--tertiary-color);
+.link:hover {
+    background-color: var(--accent-color);
+}
+
+.link:active {
+    background-color: var(--accent-soft);
 }
 
 .footer {
     opacity: .6;
     font-size: 12px;
+}
+
+
+.btnToggleTheme {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    margin-top: 2rem;
+    padding: 10px 14px;
+
+    font-family: var(--font-family);
+    font-size: 14px;
+    font-weight: 500;
+
+    border-radius: var(--border-radius);
+    border: 1px solid var(--primary-light);
+
+    cursor: pointer;
+
+    color: var(--text-color-aux);
+    background: var(--primary-light);
+
+    box-shadow: var(--shadow-sm);
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        transform 0.15s ease,
+        box-shadow 0.25s ease,
+        border 0.25s ease;
+}
+
+.btnToggleTheme:hover {
+    background: var(--grad-accent);
+    color: #fff;
+
+    border-color: transparent;
+
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btnToggleTheme:active {
+    transform: scale(0.96);
+    box-shadow: none;
+}
+
+.dark-mode .btnToggleTheme {
+    background: var(--surface-color-2);
+    /* color: var(--text-color); */
+    border: 1px solid var(--border-color-dark);
+}
+
+.dark-mode .btnToggleTheme:hover {
+    background: var(--grad-hero);
+    color: #fff;
+}
+
+.btnToggleTheme span {
+    display: inline-flex;
+    align-items: center;
 }

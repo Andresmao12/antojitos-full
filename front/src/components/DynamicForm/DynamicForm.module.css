@@ -1,11 +1,11 @@
 .formCreate {
     width: 100%;
-    padding: 2em 0;
+    padding: 2rem 0;
 
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1em;
+    gap: 1rem;
 
 }
 
@@ -17,16 +17,17 @@
 
     position: relative;
     width: 100%;
-    height: 50px;
-    margin-top: 1em;
+    height: 3rem;
+    margin-top: 1rem;
 }
 
 .inpCont label {
     position: absolute;
-    left: 1em;
+    left: 1rem;
     font-weight: 400;
     opacity: .5;
     transition: 500ms;
+    color: var(--text-color);
 
     cursor: text;
 }
@@ -42,8 +43,8 @@
 
 .inpContTextArea label {
     position: absolute;
-    top: 10px;
-    left: 1em;
+    top: 1px;
+    left: 10rem;
     font-weight: 400;
     opacity: .5;
     transition: 500ms;
@@ -62,8 +63,8 @@
 .textarea {
     width: 100%;
     height: 100%;
-    background-color: #fff;
-    color: #000;
+    background-color: var(--surface-color-2);
+    color: var(--text-color);
     outline: none;
     border: 2px solid rgba(0, 0, 0, 0.1);
     font-size: 16px;
@@ -72,7 +73,7 @@
 }
 
 .inpCont input {
-    border-radius: 40px;
+    border-radius: var(--border-radius);
 }
 
 .textarea {

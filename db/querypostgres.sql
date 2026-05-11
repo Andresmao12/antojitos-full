@@ -19,8 +19,8 @@ create table rol (
 create table usuario (
     id serial primary key,
     nombre varchar(100) not null,
-    correo varchar(100) unique not null,
-    celular varchar(20),
+    correo varchar(100) not null,
+    celular varchar(20) unique not null,
     direccion text,
     estado boolean default true,
     fecha_registro timestamptz default current_timestamp,

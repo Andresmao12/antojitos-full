@@ -1,7 +1,7 @@
 .tableCont {
     width: 100%;
 
-    box-shadow: 0 0 30px -25px #000;
+    box-shadow: var(--shadow-sm);
 
     border-collapse: collapse;
 }
@@ -19,16 +19,24 @@
 
 .head {
     background-color: var(--primary-color);
+    color: var(--text-color-aux);
+}
+
+.tableCont_body{
+    background-color: var(--surface-color);
+    color: var(--text-color);
+
+    &::selection{
+        background-color: var(--primary-light);
+        color: var(--text-color);
+    }
 }
 
 .register:hover {
-    background-color: var(--tertiary-color);
+    background-color: var(--surface-color-2);
 }
 
 .register_btnCont {
-
-    /* height: 50px; */
-
     display: flex;
     justify-content: center;
     gap: .2em;
